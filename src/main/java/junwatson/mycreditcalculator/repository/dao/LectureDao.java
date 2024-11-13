@@ -35,6 +35,20 @@ public class LectureDao {
     }
 
     /**
+     * id를 통해 강의를 삭제하는 메서드
+     * 다른 Member의 강의를 삭제하려 시도한 경우 예외를 발생시킴
+     */
+    public Lecture removeLectureById(Member member, Long lectureId) {
+        Lecture lecture = em.find(Lecture.class, lectureId);
+        if (lecture.getMember() != member) {
+            throw new IllegalMemberStateException("다른 회원의 강의는 삭제할 수 없습니다.");
+        }
+        em.remove(lecture);
+
+        return lecture;
+    }
+
+    /**
      * 해당 회원의 전체 강의를 조건에 따라 조회하는 메서드.
      */
     public List<Lecture> findLecturesByMember(Member member, LectureSearchCondition condition) {

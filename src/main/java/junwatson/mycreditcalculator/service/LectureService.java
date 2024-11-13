@@ -43,4 +43,13 @@ public class LectureService {
         Member member = repository.findMemberByAccessToken(token);
         return repository.registerLecture(member, lectureDto);
     }
+
+    /**
+     * 강의 삭제 메서드
+     */
+    public LectureInfoResponseDto deleteLecture(String token, Long lectureId) {
+        Member member = repository.findMemberByAccessToken(token);
+        Lecture deletedLecture = repository.removeLectureById(member, lectureId);
+        return LectureInfoResponseDto.from(deletedLecture);
+    }
 }

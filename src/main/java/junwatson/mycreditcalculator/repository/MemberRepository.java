@@ -58,10 +58,18 @@ public class MemberRepository {
     }
 
     /**
-     * 강의를 조회하는 메서드
+     * 전체 강의를 조회하는 메서드
      */
     public List<Lecture> findLecturesByCondition(Member member, LectureSearchCondition condition) {
         return lectureDao.findLecturesByMember(member, condition);
+    }
+
+    /**
+     * 강의를 id를 통해 삭제하는 메서드
+     * 다른 멤버의 강의는 삭제하지 못하게 함
+     */
+    public Lecture removeLectureById(Member member, Long lectureId) {
+        return lectureDao.removeLectureById(member, lectureId);
     }
 
     /**
