@@ -32,6 +32,10 @@ public class Member {
     @Column(nullable = false)
     private String name;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private MemberRole role;
+
     @Builder
     private Member(String email, String password, String name) {
         this.email = email;
