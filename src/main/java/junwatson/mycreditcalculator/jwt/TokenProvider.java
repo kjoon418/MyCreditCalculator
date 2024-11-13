@@ -48,6 +48,7 @@ public class TokenProvider {
                 .setSubject(member.getId().toString())
                 // 클레임을 추가함 - "Role":"멤버의 ID"
                 .claim(ROLE_CLAIM, member.getRole())
+                .setExpiration(accessTokenExpiredTime)
                 // HS256 알고리즘과 시크릿 키를 통해 시그니처를 생성함
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
