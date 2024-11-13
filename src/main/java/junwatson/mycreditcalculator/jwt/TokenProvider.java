@@ -31,7 +31,7 @@ public class TokenProvider {
     private final long accessTokenValidityTime;
 
     public TokenProvider(@Value("${jwt.secret}") String secretKey,
-                         @Value("${jwt.access-token-validity-in-milliseconds") long accessTokenValidityTime) {
+                         @Value("${jwt.access-token-validity-in-milliseconds}") long accessTokenValidityTime) {
         // secretKey를 이용해서 keyBytes를 생성한다
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         // key byte array를 기반으로, 적절한 HMAC 알고리즘을 적용한 Key 객체를 생성한다
