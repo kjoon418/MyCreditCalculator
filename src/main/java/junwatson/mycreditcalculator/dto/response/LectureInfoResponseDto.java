@@ -11,6 +11,7 @@ import lombok.Getter;
 @Getter
 public class LectureInfoResponseDto {
 
+    private Long id;
     private String name;
     private Double credit;
     private String major;
@@ -19,6 +20,7 @@ public class LectureInfoResponseDto {
 
     public static LectureInfoResponseDto from(Lecture lecture) {
         return LectureInfoResponseDto.builder()
+                .id(lecture.getId())
                 .name(lecture.getName())
                 .credit(lecture.getCredit())
                 .major(lecture.getMajor())
