@@ -30,8 +30,12 @@ public class Lecture {
     @Column(nullable = false)
     private Integer semester;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private LectureType type;
+
     @Builder
-    private Lecture(Member member, String name, Double credit, String major, Integer semester) {
+    private Lecture(Member member, String name, Double credit, String major, Integer semester, LectureType type) {
         this.member = member;
         member.getLectures()
                 .add(this);
@@ -39,5 +43,6 @@ public class Lecture {
         this.credit = credit;
         this.major = major;
         this.semester = semester;
+        this.type = type;
     }
 }
