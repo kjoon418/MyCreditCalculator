@@ -111,7 +111,7 @@ public class TokenProvider {
         }
     }
 
-    private Claims parseClaims(String accessToken) {
+    public Claims parseClaims(String accessToken) {
         try {
             return Jwts.parserBuilder()
                     // 시그니처 복호화에 사용할 SECRET KEY 지정
