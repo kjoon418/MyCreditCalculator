@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import static jakarta.persistence.FetchType.*;
 import static jakarta.persistence.GenerationType.*;
 
 @Entity
@@ -17,7 +18,7 @@ public class Lecture {
     private Long id;
 
     @JoinColumn(nullable = false)
-    @ManyToOne
+    @ManyToOne(fetch = LAZY)
     private Member member;
 
     @Column(nullable = false)
