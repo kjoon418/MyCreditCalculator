@@ -37,8 +37,7 @@ public class Lecture {
     @Builder
     private Lecture(Member member, String name, Double credit, String major, Integer semester, LectureType type) {
         this.member = member;
-        member.getLectures()
-                .add(this);
+        member.getLectures().add(this);
         this.name = name;
         this.credit = credit;
         this.major = major;

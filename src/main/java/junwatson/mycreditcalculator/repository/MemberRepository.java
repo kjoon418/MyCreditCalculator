@@ -1,14 +1,19 @@
 package junwatson.mycreditcalculator.repository;
 
+import io.jsonwebtoken.Claims;
 import jakarta.persistence.EntityManager;
+import junwatson.mycreditcalculator.domain.Lecture;
 import junwatson.mycreditcalculator.domain.Member;
-import junwatson.mycreditcalculator.dto.request.ManagerSignUpRequestDto;
+import junwatson.mycreditcalculator.dto.request.LectureRegistrationRequestDto;
 import junwatson.mycreditcalculator.dto.request.MemberSignInRequestDto;
 import junwatson.mycreditcalculator.dto.request.MemberSignUpRequestDto;
+import junwatson.mycreditcalculator.dto.response.LectureInfoResponseDto;
 import junwatson.mycreditcalculator.dto.token.TokenDto;
 import junwatson.mycreditcalculator.exception.IllegalMemberStateException;
 import junwatson.mycreditcalculator.exception.MemberNotExistException;
 import junwatson.mycreditcalculator.jwt.TokenProvider;
+import junwatson.mycreditcalculator.repository.dao.LectureDao;
+import junwatson.mycreditcalculator.repository.dao.LectureSearchCondition;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,12 +23,13 @@ import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
+@Transactional
 public class MemberRepository {
 
     private final EntityManager em;
     private final TokenProvider tokenProvider;
+    private final LectureDao lectureDao;
 
-    @Transactional
     public Member signUp(MemberSignUpRequestDto memberSignUpRequestDto) {
         Member member = memberSignUpRequestDto.toEntity();
 
@@ -39,7 +45,7 @@ public class MemberRepository {
     @Transactional(readOnly = true)
     public TokenDto signIn(MemberSignInRequestDto memberSignInRequestDto) {
         Member member = memberSignInRequestDto.toEntity();
-        Optional<Member> findMembers = findMemberByEmailAndPassword(member)
+        Optional<Member> findMembers = findMemberByEmailAndPassword(member.getEmail(), member.getPassword())
                 .stream()
                 .findFirst();
         Member findMember = findMembers.orElseThrow(MemberNotExistException::new);
@@ -49,6 +55,33 @@ public class MemberRepository {
         return TokenDto.builder()
                 .accessToken(accessToken)
                 .build();
+    }
+
+    /**
+     * 강의를 조회하는 메서드
+     */
+    public List<Lecture> findLecturesByCondition(Member member, LectureSearchCondition condition) {
+        return lectureDao.findLecturesByMember(member, condition);
+    }
+
+    /**
+     * 강의를 등록하는 메서드
+     */
+    public LectureInfoResponseDto registerLecture(Member member, LectureRegistrationRequestDto lectureDto) {
+        Lecture lecture = lectureDto.toEntityWithMember(member);
+        member.getLectures().add(lecture);
+
+        return LectureInfoResponseDto.from(lecture);
+    }
+
+    /**
+     * JWT를 통해 Member를 조회하는 메서드
+     */
+    @Transactional(readOnly = true)
+    public Member findMemberByAccessToken(String accessToken) {
+        Claims claims = tokenProvider.parseClaims(accessToken);
+        int id = Integer.parseInt(claims.getSubject());
+        return em.find(Member.class, id);
     }
 
     /**
@@ -63,15 +96,29 @@ public class MemberRepository {
             return false;
         }
 
-        return findMemberByEmailAndPassword(member)
-                .isEmpty();
+        // 해당 이메일로 가입한 회원이 이미 있는지 검사
+        return findMemberByEmail(member.getEmail()).isEmpty();
     }
 
+    /**
+     * 일치하는 이메일을 가진 데이터가 DB에 있는지 조회하는 메서드
+     */
     @Transactional(readOnly = true)
-    protected List<Member> findMemberByEmailAndPassword(Member member) {
+    protected List<Member> findMemberByEmail(String email) {
+        String jpql = "select m from Member m where m.email=:email";
+        return em.createQuery(jpql, Member.class)
+                .setParameter("email", email)
+                .getResultList();
+    }
+
+    /**
+     * 이메일과 비밀번호 조합과 일치하는 데이터가 DB에 있는지 조회하는 메서드
+     */
+    @Transactional(readOnly = true)
+    protected List<Member> findMemberByEmailAndPassword(String email, String password) {
         return em.createQuery("select m from Member m where m.email=:email and m.password=:password", Member.class)
-                .setParameter("email", member.getEmail())
-                .setParameter("password", member.getPassword())
+                .setParameter("email", email)
+                .setParameter("password", password)
                 .getResultList();
     }
 }
