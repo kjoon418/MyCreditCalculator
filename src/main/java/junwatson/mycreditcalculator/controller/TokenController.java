@@ -8,6 +8,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * 토큰 발급과 관련된 API를 처리하는 메서드
+ */
 @RestController
 @RequestMapping("/authorization")
 @RequiredArgsConstructor
