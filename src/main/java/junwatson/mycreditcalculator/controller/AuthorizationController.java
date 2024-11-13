@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/authorization")
 @RequiredArgsConstructor
-public class TokenController {
+public class AuthorizationController {
 
     private final MemberService memberService;
 
