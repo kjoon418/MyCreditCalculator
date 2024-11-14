@@ -13,12 +13,13 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/lecture")
 public class LectureController {
 
     private final TokenProvider tokenProvider;
     private final LectureService lectureService;
 
-    @GetMapping("/lecture")
+    @GetMapping()
     public ResponseEntity<List<LectureInfoResponseDto>> findLectures(HttpServletRequest request) {
         String token = tokenProvider.resolveToken(request);
         List<LectureInfoResponseDto> lectures = lectureService.findLectures(token);
@@ -26,7 +27,7 @@ public class LectureController {
         return ResponseEntity.ok(lectures);
     }
 
-    @PostMapping("/lecture")
+    @PostMapping()
     public ResponseEntity<LectureInfoResponseDto> registerLecture(@RequestBody LectureRegistrationRequestDto requestDto, HttpServletRequest request) {
         String token = tokenProvider.resolveToken(request);
         LectureInfoResponseDto responseDto = lectureService.registerLecture(token, requestDto);
@@ -34,7 +35,7 @@ public class LectureController {
         return ResponseEntity.ok(responseDto);
     }
 
-    @DeleteMapping("/lecture/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<LectureInfoResponseDto> deleteLecture(@PathVariable Long id, HttpServletRequest request) {
         String token = tokenProvider.resolveToken(request);
         LectureInfoResponseDto responseDto = lectureService.deleteLecture(token, id);
