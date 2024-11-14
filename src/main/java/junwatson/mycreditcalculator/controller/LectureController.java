@@ -2,6 +2,7 @@ package junwatson.mycreditcalculator.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import junwatson.mycreditcalculator.dto.request.LectureRegistrationRequestDto;
+import junwatson.mycreditcalculator.dto.request.LectureSearchRequestDto;
 import junwatson.mycreditcalculator.dto.response.LectureInfoResponseDto;
 import junwatson.mycreditcalculator.jwt.TokenProvider;
 import junwatson.mycreditcalculator.service.LectureService;
@@ -41,6 +42,14 @@ public class LectureController {
         LectureInfoResponseDto responseDto = lectureService.deleteLecture(token, id);
 
         return ResponseEntity.ok(responseDto);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<LectureInfoResponseDto>> findLecturesByCondition(@RequestBody LectureSearchRequestDto requestDto, HttpServletRequest request) {
+        String token = tokenProvider.resolveToken(request);
+        List<LectureInfoResponseDto> lectures = lectureService.searchLectures(token, requestDto);
+
+        return ResponseEntity.ok(lectures);
     }
 
 }
