@@ -14,6 +14,7 @@ import junwatson.mycreditcalculator.jwt.TokenProvider;
 import junwatson.mycreditcalculator.repository.dao.LectureDao;
 import junwatson.mycreditcalculator.repository.dao.LectureSearchCondition;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +24,7 @@ import java.util.Optional;
 @Repository
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class MemberRepository {
 
     private final EntityManager em;
@@ -30,6 +32,8 @@ public class MemberRepository {
     private final LectureDao lectureDao;
 
     public Member signUp(MemberSignUpRequestDto memberSignUpRequestDto) {
+        log.info("MemberRepository.signUp() called");
+
         Member member = memberSignUpRequestDto.toEntity();
 
         if (validate(member)) {
@@ -43,6 +47,8 @@ public class MemberRepository {
 
     @Transactional(readOnly = true)
     public TokenDto signIn(MemberSignInRequestDto memberSignInRequestDto) {
+        log.info("MemberRepository.signIn() called");
+
         Member member = memberSignInRequestDto.toEntity();
         Optional<Member> findMembers = findMemberByEmailAndPassword(member.getEmail(), member.getPassword())
                 .stream()
@@ -60,6 +66,8 @@ public class MemberRepository {
      * 전체 강의를 조회하는 메서드
      */
     public List<Lecture> findLecturesByCondition(Member member, LectureSearchCondition condition) {
+        log.info("MemberRepository.findLecturesByCondition() called");
+
         return lectureDao.findLecturesByMember(member, condition);
     }
 
@@ -68,6 +76,8 @@ public class MemberRepository {
      * 다른 멤버의 강의는 삭제하지 못하게 함
      */
     public Lecture removeLectureById(Member member, Long lectureId) {
+        log.info("MemberRepository.removeLectureById() called");
+
         return lectureDao.removeLectureById(member, lectureId);
     }
 
@@ -75,6 +85,8 @@ public class MemberRepository {
      * 강의를 등록하는 메서드
      */
     public LectureInfoResponseDto registerLecture(Member member, LectureRegistrationRequestDto lectureDto) {
+        log.info("MemberRepository.registerLecture() called");
+
         Lecture lecture = lectureDto.toEntityWithMember(member);
         member.getLectures().add(lecture);
         // lecture 엔티티의 id값이 null인 상태로 DTO 객체를 만들지 않기 위해 플러시함
@@ -88,6 +100,8 @@ public class MemberRepository {
      */
     @Transactional(readOnly = true)
     public Member findMemberById(Long id) {
+        log.info("MemberRepository.findMemberById() called");
+
         Member member = em.find(Member.class, id);
         if (member == null) {
             throw new MemberNotExistException("해당 id를 가진 멤버가 없습니다.");
@@ -101,6 +115,8 @@ public class MemberRepository {
      */
     @Transactional(readOnly = true)
     protected boolean validate(Member member) {
+        log.info("MemberRepository.validate() called");
+
         if (member == null ||
                 member.getEmail() == null ||
                 member.getName() == null ||
@@ -117,6 +133,8 @@ public class MemberRepository {
      */
     @Transactional(readOnly = true)
     protected List<Member> findMemberByEmail(String email) {
+        log.info("MemberRepository.findMemberByEmail() called");
+
         String jpql = "select m from Member m where m.email=:email";
         return em.createQuery(jpql, Member.class)
                 .setParameter("email", email)
@@ -128,6 +146,8 @@ public class MemberRepository {
      */
     @Transactional(readOnly = true)
     protected List<Member> findMemberByEmailAndPassword(String email, String password) {
+        log.info("MemberRepository.findMemberByEmailAndPassword() called");
+
         return em.createQuery("select m from Member m where m.email=:email and m.password=:password", Member.class)
                 .setParameter("email", email)
                 .setParameter("password", password)

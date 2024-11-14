@@ -10,6 +10,7 @@ import junwatson.mycreditcalculator.exception.member.MemberNotExistException;
 import junwatson.mycreditcalculator.jwt.TokenProvider;
 import junwatson.mycreditcalculator.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.PropertyValueException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +24,7 @@ import static org.springframework.http.HttpStatus.*;
  */
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 public class AuthorizationController {
 
     private final MemberService memberService;
@@ -30,6 +32,8 @@ public class AuthorizationController {
 
     @PostMapping("/authorization")
     public ResponseEntity<TokenDto> signUp(@RequestBody MemberSignUpRequestDto memberDto) {
+        log.info("AuthorizationController.signUp() called");
+
         TokenDto tokenDto = memberService.signUp(memberDto);
 
         return ResponseEntity.status(CREATED).body(tokenDto);
@@ -37,6 +41,8 @@ public class AuthorizationController {
 
     @GetMapping("/authorization")
     public ResponseEntity<TokenDto> signIn(@RequestBody MemberSignInRequestDto memberDto) {
+        log.info("AuthorizationController.signIn() called");
+
         TokenDto tokenDto = memberService.signIn(memberDto);
 
         return ResponseEntity.ok(tokenDto);
@@ -44,6 +50,8 @@ public class AuthorizationController {
 
     @GetMapping("/expire")
     public ResponseEntity<TokenDto> logout(Principal principal) {
+        log.info("AuthorizationController.logout() called");
+
         Long memberId = Long.parseLong(principal.getName());
         Member member = memberService.findMemberById(memberId);
         String token = tokenProvider.expireAccessToken(member);

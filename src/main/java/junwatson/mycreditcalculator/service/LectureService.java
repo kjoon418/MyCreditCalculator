@@ -8,6 +8,7 @@ import junwatson.mycreditcalculator.dto.response.LectureInfoResponseDto;
 import junwatson.mycreditcalculator.repository.MemberRepository;
 import junwatson.mycreditcalculator.repository.dao.LectureSearchCondition;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +18,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class LectureService {
 
     private final MemberRepository repository;
@@ -26,6 +28,8 @@ public class LectureService {
      */
     @Transactional(readOnly = true)
     public List<LectureInfoResponseDto> findLectures(Long memberId) {
+        log.info("LectureService.findLectures() called");
+
         Member member = repository.findMemberById(memberId);
         List<Lecture> findLectures = repository.findLecturesByCondition(member, LectureSearchCondition.noCondition());
 
@@ -42,6 +46,8 @@ public class LectureService {
      */
     @Transactional(readOnly = true)
     public List<LectureInfoResponseDto> searchLectures(Long memberId, LectureSearchRequestDto conditionDto) {
+        log.info("LectureService.searchLectures() called");
+
         Member member = repository.findMemberById(memberId);
         LectureSearchCondition condition = conditionDto.toCondition();
         List<Lecture> findLectures = repository.findLecturesByCondition(member, condition);
@@ -58,6 +64,8 @@ public class LectureService {
      * 강의 등록 메서드
      */
     public LectureInfoResponseDto registerLecture(Long memberId, LectureRegistrationRequestDto lectureDto) {
+        log.info("LectureService.registerLecture() called");
+
         Member member = repository.findMemberById(memberId);
         return repository.registerLecture(member, lectureDto);
     }
@@ -66,6 +74,8 @@ public class LectureService {
      * 강의 삭제 메서드
      */
     public LectureInfoResponseDto deleteLecture(Long memberId, Long lectureId) {
+        log.info("LectureService.deleteLecture() called");
+
         Member member = repository.findMemberById(memberId);
         Lecture deletedLecture = repository.removeLectureById(member, lectureId);
         return LectureInfoResponseDto.from(deletedLecture);

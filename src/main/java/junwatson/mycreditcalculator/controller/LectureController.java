@@ -7,6 +7,7 @@ import junwatson.mycreditcalculator.exception.lecture.IllegalLectureTypeExceptio
 import junwatson.mycreditcalculator.exception.lecture.LectureNotExistException;
 import junwatson.mycreditcalculator.service.LectureService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.PropertyValueException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,12 +20,15 @@ import static org.springframework.http.HttpStatus.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/lecture")
+@Slf4j
 public class LectureController {
 
     private final LectureService lectureService;
 
     @GetMapping()
     public ResponseEntity<List<LectureInfoResponseDto>> findLectures(Principal principal) {
+        log.info("LectureController.findLectures() called");
+
         long memberId = Long.parseLong(principal.getName());
         List<LectureInfoResponseDto> lectures = lectureService.findLectures(memberId);
 
@@ -33,6 +37,8 @@ public class LectureController {
 
     @PostMapping()
     public ResponseEntity<LectureInfoResponseDto> registerLecture(@RequestBody LectureRegistrationRequestDto requestDto, Principal principal) {
+        log.info("LectureController.registerLecture() called");
+
         long memberId = Long.parseLong(principal.getName());
         LectureInfoResponseDto responseDto = lectureService.registerLecture(memberId, requestDto);
 
@@ -41,6 +47,8 @@ public class LectureController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<LectureInfoResponseDto> deleteLecture(@PathVariable Long id, Principal principal) {
+        log.info("LectureController.deleteLecture() called");
+
         Long memberId = Long.parseLong(principal.getName());
         LectureInfoResponseDto responseDto = lectureService.deleteLecture(memberId, id);
 
@@ -49,6 +57,8 @@ public class LectureController {
 
     @GetMapping("/search")
     public ResponseEntity<List<LectureInfoResponseDto>> findLecturesByCondition(@RequestBody LectureSearchRequestDto requestDto, Principal principal) {
+        log.info("LectureController.findLecturesByCondition() called");
+
         Long memberId = Long.parseLong(principal.getName());
         List<LectureInfoResponseDto> lectures = lectureService.searchLectures(memberId, requestDto);
 
