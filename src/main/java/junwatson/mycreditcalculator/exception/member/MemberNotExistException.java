@@ -1,4 +1,4 @@
-package junwatson.mycreditcalculator.exception;
+package junwatson.mycreditcalculator.exception.member;
 
 /**
  * 회원이 조회되지 않을 때 발생하는 예외
