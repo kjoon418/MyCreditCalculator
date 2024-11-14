@@ -36,7 +36,7 @@ public class MemberService {
     public TokenDto signIn(MemberSignInRequestDto memberSignInRequestDto) {
         log.info("MemberService.signIn() called");
 
-         return repository.signIn(memberSignInRequestDto);
+        return repository.signIn(memberSignInRequestDto);
     }
 
     @Transactional(readOnly = true)
