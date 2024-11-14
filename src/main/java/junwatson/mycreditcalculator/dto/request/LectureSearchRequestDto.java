@@ -10,12 +10,14 @@ import lombok.Getter;
 @Getter
 public class LectureSearchRequestDto {
     Integer semester;
-    boolean majorOnly;
+    Boolean majorOnly;
 
     public LectureSearchCondition toCondition() {
+        boolean isMajorOnly = majorOnly != null && majorOnly;
+
         return LectureSearchCondition.builder()
                 .semester(semester)
-                .majorOnly(majorOnly)
+                .majorOnly(isMajorOnly)
                 .build();
     }
 }
