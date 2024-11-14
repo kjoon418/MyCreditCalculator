@@ -2,13 +2,9 @@ package junwatson.mycreditcalculator.dto.request;
 
 import junwatson.mycreditcalculator.domain.Member;
 import junwatson.mycreditcalculator.domain.MemberRole;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-@AllArgsConstructor
-@Builder
 public class ManagerSignUpRequestDto {
     private String email;
     private String password;

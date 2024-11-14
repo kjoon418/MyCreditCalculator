@@ -4,12 +4,8 @@ import junwatson.mycreditcalculator.domain.Lecture;
 import junwatson.mycreditcalculator.domain.LectureType;
 import junwatson.mycreditcalculator.domain.Member;
 import junwatson.mycreditcalculator.exception.lecture.IllegalLectureTypeException;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 
-@AllArgsConstructor
-@Builder
 @Getter
 public class LectureRegistrationRequestDto {
 
