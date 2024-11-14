@@ -1,15 +1,12 @@
 package junwatson.mycreditcalculator.repository.dao;
 
-import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import io.jsonwebtoken.Claims;
 import jakarta.persistence.EntityManager;
 import junwatson.mycreditcalculator.domain.Lecture;
 import junwatson.mycreditcalculator.domain.LectureType;
 import junwatson.mycreditcalculator.domain.Member;
-import junwatson.mycreditcalculator.exception.IllegalMemberStateException;
-import junwatson.mycreditcalculator.jwt.TokenProvider;
-import org.springframework.beans.factory.annotation.Autowired;
+import junwatson.mycreditcalculator.exception.lecture.LectureNotExistException;
+import junwatson.mycreditcalculator.exception.member.IllegalMemberStateException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,22 +14,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static junwatson.mycreditcalculator.domain.QLecture.*;
-
 @Repository
 @Transactional
+@RequiredArgsConstructor
 public class LectureDao {
 
     private final EntityManager em;
-    private final JPAQueryFactory query;
-    private final TokenProvider tokenProvider;
-
-    @Autowired
-    public LectureDao(EntityManager em, TokenProvider tokenProvider) {
-        this.em = em;
-        this.query = new JPAQueryFactory(em);
-        this.tokenProvider = tokenProvider;
-    }
 
     /**
      * id를 통해 강의를 삭제하는 메서드
@@ -40,6 +27,9 @@ public class LectureDao {
      */
     public Lecture removeLectureById(Member member, Long lectureId) {
         Lecture lecture = em.find(Lecture.class, lectureId);
+        if (lecture == null) {
+            throw new LectureNotExistException("강의 조회에 실패했습니다.");
+        }
         if (lecture.getMember() != member) {
             throw new IllegalMemberStateException("다른 회원의 강의는 삭제할 수 없습니다.");
         }
@@ -63,31 +53,11 @@ public class LectureDao {
         if (semester != null) {
             stream = stream.filter(lecture -> lecture.getSemester().equals(semester));
         }
-
-        return stream.collect(Collectors.toList());
-    }
-
-    private BooleanExpression sameMember(Member member) {
-        if (member == null || member.getId() == null) {
-            throw new IllegalMemberStateException("강의 검색에 실패했습니다: Member 혹은 Member의 Id는 null일 수 없습니다.");
+        List<Lecture> result = stream.collect(Collectors.toList());
+        if (result.isEmpty()) {
+            throw new LectureNotExistException("해당 조건으로 조회된 강의가 없습니다.");
         }
 
-        return lecture.member.eq(member);
-    }
-
-    private BooleanExpression onlyMajor(boolean isMajorOnly) {
-        if (!isMajorOnly) {
-            return null;
-        }
-
-        return lecture.type.eq(LectureType.MajorCourses);
-    }
-
-    private BooleanExpression selectSemester(Integer semester) {
-        if (semester == null) {
-            return null;
-        }
-
-        return lecture.semester.eq(semester);
+        return result;
     }
 }
