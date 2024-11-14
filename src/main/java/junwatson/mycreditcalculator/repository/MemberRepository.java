@@ -13,16 +13,17 @@ import junwatson.mycreditcalculator.exception.member.MemberNotExistException;
 import junwatson.mycreditcalculator.jwt.TokenProvider;
 import junwatson.mycreditcalculator.repository.dao.LectureDao;
 import junwatson.mycreditcalculator.repository.dao.LectureSearchCondition;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
-@RequiredArgsConstructor
 @Transactional
 @Slf4j
 public class MemberRepository {
@@ -30,7 +31,24 @@ public class MemberRepository {
     private final EntityManager em;
     private final TokenProvider tokenProvider;
     private final LectureDao lectureDao;
+    private final HashSet<Character> ALLOWED_WORDS = new HashSet<>();
 
+    @Autowired
+    public MemberRepository(EntityManager em, TokenProvider tokenProvider, LectureDao lectureDao) {
+        this.em = em;
+        this.tokenProvider = tokenProvider;
+        this.lectureDao = lectureDao;
+
+        char[] allowedWordsArr = {'!', '@', '#', '$', '%', '^', '&', '*'};
+
+        for (char word : allowedWordsArr) {
+            ALLOWED_WORDS.add(word);
+        }
+    }
+
+    /**
+     * 회원 가입 메서드
+     */
     public Member signUp(MemberSignUpRequestDto memberSignUpRequestDto) {
         log.info("MemberRepository.signUp() called");
 
@@ -45,6 +63,9 @@ public class MemberRepository {
         return member;
     }
 
+    /**
+     * 로그인 메서드
+     */
     @Transactional(readOnly = true)
     public TokenDto signIn(MemberSignInRequestDto memberSignInRequestDto) {
         log.info("MemberRepository.signIn() called");
@@ -53,7 +74,7 @@ public class MemberRepository {
         Optional<Member> findMembers = findMemberByEmailAndPassword(member.getEmail(), member.getPassword())
                 .stream()
                 .findFirst();
-        Member findMember = findMembers.orElseThrow(() -> new MemberNotExistException("아이디 비밀번호가 틀립니다."));
+        Member findMember = findMembers.orElseThrow(() -> new MemberNotExistException("아이디 혹은 비밀번호가 틀립니다."));
 
         String accessToken = tokenProvider.createAccessToken(findMember);
 
@@ -113,19 +134,53 @@ public class MemberRepository {
     /**
      * 해당 회원 정보로 회원가입이 가능한지 유효성을 검사하는 메서드.
      */
-    @Transactional(readOnly = true)
-    protected boolean validate(Member member) {
+    private boolean validate(Member member) {
         log.info("MemberRepository.validate() called");
 
-        if (member == null ||
-                member.getEmail() == null ||
-                member.getName() == null ||
-                member.getPassword() == null) {
+        // 이메일, 이름, 패스워드중 하나라도 null 있다면 불가능
+        if (member != null &&
+                !StringUtils.hasText(member.getEmail()) &&
+                !StringUtils.hasText(member.getName()) &&
+                !StringUtils.hasText(member.getPassword())) {
+            return false;
+        }
+
+        // 공백이 들어가면 불가능
+        if (member.getEmail().contains(" ") ||
+            member.getName().contains(" ") ||
+            member.getPassword().contains(" ")) {
+            return false;
+        }
+
+        // 영어나 숫자가 아니면서, 허용되지 않은 문자가 들어가면 불가능
+        if (isIllegalString(member.getEmail()) ||
+            isIllegalString(member.getName()) ||
+            isIllegalString(member.getPassword())) {
             return false;
         }
 
         // 해당 이메일로 가입한 회원이 이미 있는지 검사
         return findMemberByEmail(member.getEmail()).isEmpty();
+    }
+
+    /**
+     * 해당 String이 영어나 숫자가 아니면서 허용되지 않은 문자를 포함하는지 확인하는 메서드
+     */
+    private boolean isIllegalString(String string) {
+        for (int i = 0; i < string.length(); i++) {
+            char word = string.charAt(i);
+            if (Character.isAlphabetic(word)) {
+                continue;
+            }
+            if (Character.isDigit(word)) {
+                continue;
+            }
+            if (!ALLOWED_WORDS.contains(word)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
