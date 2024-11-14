@@ -126,4 +126,18 @@ public class TokenProvider {
             throw new RuntimeException("토큰 복호화에 실패했습니다.");
         }
     }
+
+    public String expireAccessToken(Member member) {
+        Date accessTokenExpiredTime = new Date();
+
+        return Jwts.builder()
+                // 토큰 제목(sub 클레임)을 지정한다
+                .setSubject(member.getId().toString())
+                // 클레임을 추가함 - "Role":"멤버의 ID"
+                .claim(ROLE_CLAIM, member.getRole())
+                .setExpiration(accessTokenExpiredTime)
+                // HS256 알고리즘과 시크릿 키를 통해 시그니처를 생성함
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+    }
 }
