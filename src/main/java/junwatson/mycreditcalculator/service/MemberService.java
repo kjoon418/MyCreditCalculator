@@ -1,7 +1,6 @@
 package junwatson.mycreditcalculator.service;
 
 import junwatson.mycreditcalculator.domain.Member;
-import junwatson.mycreditcalculator.dto.request.ManagerSignUpRequestDto;
 import junwatson.mycreditcalculator.dto.request.MemberSignInRequestDto;
 import junwatson.mycreditcalculator.dto.request.MemberSignUpRequestDto;
 import junwatson.mycreditcalculator.dto.token.TokenDto;

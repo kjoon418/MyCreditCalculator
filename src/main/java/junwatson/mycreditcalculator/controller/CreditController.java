@@ -1,10 +1,8 @@
 package junwatson.mycreditcalculator.controller;
 
-import jakarta.servlet.http.HttpServletRequest;
 import junwatson.mycreditcalculator.dto.request.LectureSearchRequestDto;
 import junwatson.mycreditcalculator.exception.lecture.IllegalLectureTypeException;
 import junwatson.mycreditcalculator.exception.lecture.LectureNotExistException;
-import junwatson.mycreditcalculator.jwt.TokenProvider;
 import junwatson.mycreditcalculator.service.CreditService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
