@@ -1,6 +1,5 @@
 package junwatson.mycreditcalculator.repository;
 
-import io.jsonwebtoken.Claims;
 import jakarta.persistence.EntityManager;
 import junwatson.mycreditcalculator.domain.Lecture;
 import junwatson.mycreditcalculator.domain.Member;
@@ -9,8 +8,8 @@ import junwatson.mycreditcalculator.dto.request.MemberSignInRequestDto;
 import junwatson.mycreditcalculator.dto.request.MemberSignUpRequestDto;
 import junwatson.mycreditcalculator.dto.response.LectureInfoResponseDto;
 import junwatson.mycreditcalculator.dto.token.TokenDto;
-import junwatson.mycreditcalculator.exception.IllegalMemberStateException;
-import junwatson.mycreditcalculator.exception.MemberNotExistException;
+import junwatson.mycreditcalculator.exception.member.IllegalMemberStateException;
+import junwatson.mycreditcalculator.exception.member.MemberNotExistException;
 import junwatson.mycreditcalculator.jwt.TokenProvider;
 import junwatson.mycreditcalculator.repository.dao.LectureDao;
 import junwatson.mycreditcalculator.repository.dao.LectureSearchCondition;
@@ -48,7 +47,7 @@ public class MemberRepository {
         Optional<Member> findMembers = findMemberByEmailAndPassword(member.getEmail(), member.getPassword())
                 .stream()
                 .findFirst();
-        Member findMember = findMembers.orElseThrow(MemberNotExistException::new);
+        Member findMember = findMembers.orElseThrow(() -> new MemberNotExistException("아이디 비밀번호가 틀립니다."));
 
         String accessToken = tokenProvider.createAccessToken(findMember);
 
@@ -89,7 +88,12 @@ public class MemberRepository {
      */
     @Transactional(readOnly = true)
     public Member findMemberById(Long id) {
-        return em.find(Member.class, id);
+        Member member = em.find(Member.class, id);
+        if (member == null) {
+            throw new MemberNotExistException("해당 id를 가진 멤버가 없습니다.");
+        }
+
+        return member;
     }
 
     /**

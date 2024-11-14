@@ -1,17 +1,20 @@
 package junwatson.mycreditcalculator.controller;
 
-import jakarta.servlet.http.HttpServletRequest;
 import junwatson.mycreditcalculator.dto.request.LectureRegistrationRequestDto;
 import junwatson.mycreditcalculator.dto.request.LectureSearchRequestDto;
 import junwatson.mycreditcalculator.dto.response.LectureInfoResponseDto;
-import junwatson.mycreditcalculator.jwt.TokenProvider;
+import junwatson.mycreditcalculator.exception.lecture.IllegalLectureTypeException;
+import junwatson.mycreditcalculator.exception.lecture.LectureNotExistException;
 import junwatson.mycreditcalculator.service.LectureService;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.PropertyValueException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
+
+import static org.springframework.http.HttpStatus.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -52,4 +55,18 @@ public class LectureController {
         return ResponseEntity.ok(lectures);
     }
 
+    @ExceptionHandler(LectureNotExistException.class)
+    public ResponseEntity<String> handleLectureNotExistException(LectureNotExistException exception) {
+        return ResponseEntity.status(NOT_FOUND).body(exception.getMessage());
+    }
+
+    @ExceptionHandler(IllegalLectureTypeException.class)
+    public ResponseEntity<String> handIllegalLectureTypeException(IllegalLectureTypeException exception) {
+        return ResponseEntity.status(BAD_REQUEST).body(exception.getMessage());
+    }
+
+    @ExceptionHandler(PropertyValueException.class)
+    public ResponseEntity<String> handlePropertyValueException(PropertyValueException exception) {
+        return ResponseEntity.status(BAD_REQUEST).body("잘못된 값 전달입니다.");
+    }
 }
