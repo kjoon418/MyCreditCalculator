@@ -78,6 +78,8 @@ public class MemberRepository {
     public LectureInfoResponseDto registerLecture(Member member, LectureRegistrationRequestDto lectureDto) {
         Lecture lecture = lectureDto.toEntityWithMember(member);
         member.getLectures().add(lecture);
+        // lecture 엔티티의 id값이 null인 상태로 DTO 객체를 만들지 않기 위해 플러시함
+        em.flush();
 
         return LectureInfoResponseDto.from(lecture);
     }
