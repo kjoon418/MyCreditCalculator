@@ -11,26 +11,27 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Principal;
+
 @RestController
 @RequestMapping("/credit")
 @RequiredArgsConstructor
 public class CreditController {
 
     private final CreditService creditService;
-    private final TokenProvider tokenProvider;
 
     @GetMapping
-    public ResponseEntity<Double> getTotalAverageCredit(HttpServletRequest request) {
-        String token = tokenProvider.resolveToken(request);
-        Double averageCredit = creditService.calculateTotalCredit(token);
+    public ResponseEntity<Double> getTotalAverageCredit(Principal principal) {
+        long memberId = Long.parseLong(principal.getName());
+        Double averageCredit = creditService.calculateTotalCredit(memberId);
 
         return ResponseEntity.ok(averageCredit);
     }
 
     @GetMapping("/search")
-    public ResponseEntity<Double> getAverageCreditWithCondition(@RequestBody LectureSearchRequestDto requestDto, HttpServletRequest request) {
-        String token = tokenProvider.resolveToken(request);
-        Double averageCredit = creditService.calculateCreditWithCondition(token, requestDto);
+    public ResponseEntity<Double> getAverageCreditWithCondition(@RequestBody LectureSearchRequestDto requestDto, Principal principal) {
+        long memberId = Long.parseLong(principal.getName());
+        Double averageCredit = creditService.calculateCreditWithCondition(memberId, requestDto);
 
         return ResponseEntity.ok(averageCredit);
     }

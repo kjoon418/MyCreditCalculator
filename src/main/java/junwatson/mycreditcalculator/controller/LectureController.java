@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -17,37 +18,36 @@ import java.util.List;
 @RequestMapping("/lecture")
 public class LectureController {
 
-    private final TokenProvider tokenProvider;
     private final LectureService lectureService;
 
     @GetMapping()
-    public ResponseEntity<List<LectureInfoResponseDto>> findLectures(HttpServletRequest request) {
-        String token = tokenProvider.resolveToken(request);
-        List<LectureInfoResponseDto> lectures = lectureService.findLectures(token);
+    public ResponseEntity<List<LectureInfoResponseDto>> findLectures(Principal principal) {
+        long memberId = Long.parseLong(principal.getName());
+        List<LectureInfoResponseDto> lectures = lectureService.findLectures(memberId);
 
         return ResponseEntity.ok(lectures);
     }
 
     @PostMapping()
-    public ResponseEntity<LectureInfoResponseDto> registerLecture(@RequestBody LectureRegistrationRequestDto requestDto, HttpServletRequest request) {
-        String token = tokenProvider.resolveToken(request);
-        LectureInfoResponseDto responseDto = lectureService.registerLecture(token, requestDto);
+    public ResponseEntity<LectureInfoResponseDto> registerLecture(@RequestBody LectureRegistrationRequestDto requestDto, Principal principal) {
+        long memberId = Long.parseLong(principal.getName());
+        LectureInfoResponseDto responseDto = lectureService.registerLecture(memberId, requestDto);
 
         return ResponseEntity.ok(responseDto);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<LectureInfoResponseDto> deleteLecture(@PathVariable Long id, HttpServletRequest request) {
-        String token = tokenProvider.resolveToken(request);
-        LectureInfoResponseDto responseDto = lectureService.deleteLecture(token, id);
+    public ResponseEntity<LectureInfoResponseDto> deleteLecture(@PathVariable Long id, Principal principal) {
+        Long memberId = Long.parseLong(principal.getName());
+        LectureInfoResponseDto responseDto = lectureService.deleteLecture(memberId, id);
 
         return ResponseEntity.ok(responseDto);
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<LectureInfoResponseDto>> findLecturesByCondition(@RequestBody LectureSearchRequestDto requestDto, HttpServletRequest request) {
-        String token = tokenProvider.resolveToken(request);
-        List<LectureInfoResponseDto> lectures = lectureService.searchLectures(token, requestDto);
+    public ResponseEntity<List<LectureInfoResponseDto>> findLecturesByCondition(@RequestBody LectureSearchRequestDto requestDto, Principal principal) {
+        Long memberId = Long.parseLong(principal.getName());
+        List<LectureInfoResponseDto> lectures = lectureService.searchLectures(memberId, requestDto);
 
         return ResponseEntity.ok(lectures);
     }

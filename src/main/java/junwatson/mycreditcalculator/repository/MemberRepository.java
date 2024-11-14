@@ -85,12 +85,10 @@ public class MemberRepository {
     }
 
     /**
-     * JWT를 통해 Member를 조회하는 메서드
+     * PK를 통해 Member를 조회하는 메서드
      */
     @Transactional(readOnly = true)
-    public Member findMemberByAccessToken(String accessToken) {
-        Claims claims = tokenProvider.parseClaims(accessToken);
-        int id = Integer.parseInt(claims.getSubject());
+    public Member findMemberById(Long id) {
         return em.find(Member.class, id);
     }
 

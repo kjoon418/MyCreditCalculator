@@ -18,15 +18,15 @@ public class CreditService {
 
     private final MemberRepository repository;
 
-    public Double calculateTotalCredit(String token) {
-        Member member = repository.findMemberByAccessToken(token);
+    public Double calculateTotalCredit(Long memberId) {
+        Member member = repository.findMemberById(memberId);
         List<Lecture> lectures = repository.findLecturesByCondition(member, LectureSearchCondition.noCondition());
 
         return calculateAverageCredit(lectures);
     }
 
-    public Double calculateCreditWithCondition(String token, LectureSearchRequestDto conditionDto) {
-        Member member = repository.findMemberByAccessToken(token);
+    public Double calculateCreditWithCondition(Long memberId, LectureSearchRequestDto conditionDto) {
+        Member member = repository.findMemberById(memberId);
         List<Lecture> lectures = repository.findLecturesByCondition(member, conditionDto.toCondition());
 
         return calculateAverageCredit(lectures);

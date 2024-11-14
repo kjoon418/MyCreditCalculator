@@ -25,8 +25,8 @@ public class LectureService {
      * 강의 전체 조회 메서드
      */
     @Transactional(readOnly = true)
-    public List<LectureInfoResponseDto> findLectures(String token) {
-        Member member = repository.findMemberByAccessToken(token);
+    public List<LectureInfoResponseDto> findLectures(Long memberId) {
+        Member member = repository.findMemberById(memberId);
         List<Lecture> findLectures = repository.findLecturesByCondition(member, LectureSearchCondition.noCondition());
 
         List<LectureInfoResponseDto> result = new ArrayList<>();
@@ -41,8 +41,8 @@ public class LectureService {
      * 강의 조건 검색 메서드
      */
     @Transactional(readOnly = true)
-    public List<LectureInfoResponseDto> searchLectures(String token, LectureSearchRequestDto conditionDto) {
-        Member member = repository.findMemberByAccessToken(token);
+    public List<LectureInfoResponseDto> searchLectures(Long memberId, LectureSearchRequestDto conditionDto) {
+        Member member = repository.findMemberById(memberId);
         LectureSearchCondition condition = conditionDto.toCondition();
         List<Lecture> findLectures = repository.findLecturesByCondition(member, condition);
 
@@ -57,16 +57,16 @@ public class LectureService {
     /**
      * 강의 등록 메서드
      */
-    public LectureInfoResponseDto registerLecture(String token, LectureRegistrationRequestDto lectureDto) {
-        Member member = repository.findMemberByAccessToken(token);
+    public LectureInfoResponseDto registerLecture(Long memberId, LectureRegistrationRequestDto lectureDto) {
+        Member member = repository.findMemberById(memberId);
         return repository.registerLecture(member, lectureDto);
     }
 
     /**
      * 강의 삭제 메서드
      */
-    public LectureInfoResponseDto deleteLecture(String token, Long lectureId) {
-        Member member = repository.findMemberByAccessToken(token);
+    public LectureInfoResponseDto deleteLecture(Long memberId, Long lectureId) {
+        Member member = repository.findMemberById(memberId);
         Lecture deletedLecture = repository.removeLectureById(member, lectureId);
         return LectureInfoResponseDto.from(deletedLecture);
     }
