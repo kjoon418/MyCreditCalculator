@@ -6,6 +6,7 @@ import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.http.HttpServletRequest;
 import junwatson.mycreditcalculator.domain.Member;
+import junwatson.mycreditcalculator.exception.token.IllegalTokenException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -62,7 +63,7 @@ public class TokenProvider {
 
         // 권한 정보(Role)가 없는 사용자면 예외 발생
         if (claims.get(ROLE_CLAIM) == null) {
-            throw new RuntimeException("권한 정보가 없는 토큰입니다.");
+            throw new IllegalTokenException("권한 정보가 없는 토큰입니다.");
         }
 
         // 쉼표로 구분되어 있는 권한 정보를 쪼개서 배열로 만듦
@@ -123,7 +124,7 @@ public class TokenProvider {
         } catch (ExpiredJwtException e) {
             return e.getClaims();
         } catch (SignatureException e) {
-            throw new RuntimeException("토큰 복호화에 실패했습니다.");
+            throw new IllegalTokenException("토큰 복호화에 실패했습니다.");
         }
     }
 
