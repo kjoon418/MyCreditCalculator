@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -21,25 +22,33 @@ import java.util.stream.Stream;
 @Slf4j
 public class LectureDao {
 
-    private final EntityManager em;
-
     /**
      * id를 통해 강의를 삭제하는 메서드
-     * 다른 Member의 강의를 삭제하려 시도한 경우 예외를 발생시킴
      */
     public Lecture removeLectureById(Member member, Long lectureId) {
         log.info("LectureDao.removeLectureById() called");
 
-        Lecture lecture = em.find(Lecture.class, lectureId);
-        if (lecture == null) {
-            throw new LectureNotExistException("강의 조회에 실패했습니다.");
-        }
-        if (lecture.getMember() != member) {
-            throw new IllegalMemberStateException("다른 회원의 강의는 삭제할 수 없습니다.");
-        }
-        em.remove(lecture);
+        Lecture lecture = findLectureById(member, lectureId);
+        member.getLectures().remove(lecture);
 
         return lecture;
+    }
+
+    /**
+     * id를 통해 강의를 조회하는 메서드
+     */
+    public Lecture findLectureById(Member member, Long lectureId) {
+        return member.getLectures().stream()
+                .filter(lecture -> lecture.getId().equals(lectureId))
+                .findAny()
+                .orElseThrow(() -> new LectureNotExistException("해당 id를 가진 강의가 존재하지 않습니다."));
+    }
+
+    /**
+     * 강의를 수정하는 메서드
+     */
+    public Lecture updateLecture(Lecture lecture, String name, Double credit, String major, Integer semester, LectureType type) {
+        return lecture.update(name, credit, major, semester, type);
     }
 
     /**

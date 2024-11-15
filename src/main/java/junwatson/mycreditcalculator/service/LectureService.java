@@ -4,6 +4,7 @@ import junwatson.mycreditcalculator.domain.Lecture;
 import junwatson.mycreditcalculator.domain.Member;
 import junwatson.mycreditcalculator.dto.request.LectureRegistrationRequestDto;
 import junwatson.mycreditcalculator.dto.request.LectureSearchRequestDto;
+import junwatson.mycreditcalculator.dto.request.LectureUpdateRequestDto;
 import junwatson.mycreditcalculator.dto.response.LectureInfoResponseDto;
 import junwatson.mycreditcalculator.repository.MemberRepository;
 import junwatson.mycreditcalculator.repository.dao.LectureSearchCondition;
@@ -82,5 +83,17 @@ public class LectureService {
         Lecture deletedLecture = repository.removeLectureById(member, lectureId);
 
         return LectureInfoResponseDto.from(deletedLecture);
+    }
+
+    /**
+     * 강의 수정 메서드
+     */
+    public LectureInfoResponseDto updateLecture(Long memberId, LectureUpdateRequestDto lectureDto) {
+        log.info("LectureService.updateLecture() called");
+
+        Member member = repository.findMemberById(memberId);
+        Lecture lecture = repository.updateLecture(member, lectureDto);
+
+        return LectureInfoResponseDto.from(lecture);
     }
 }

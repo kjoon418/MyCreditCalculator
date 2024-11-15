@@ -4,6 +4,7 @@ import jakarta.persistence.EntityManager;
 import junwatson.mycreditcalculator.domain.Lecture;
 import junwatson.mycreditcalculator.domain.Member;
 import junwatson.mycreditcalculator.dto.request.LectureRegistrationRequestDto;
+import junwatson.mycreditcalculator.dto.request.LectureUpdateRequestDto;
 import junwatson.mycreditcalculator.dto.request.MemberSignInRequestDto;
 import junwatson.mycreditcalculator.dto.request.MemberSignUpRequestDto;
 import junwatson.mycreditcalculator.dto.response.LectureInfoResponseDto;
@@ -108,13 +109,18 @@ public class MemberRepository {
     }
 
     /**
-     * 강의를 id를 통해 삭제하는 메서드
-     * 다른 멤버의 강의는 삭제하지 못하게 함
+     * PK를 통해 Member를 조회하는 메서드
      */
-    public Lecture removeLectureById(Member member, Long lectureId) {
-        log.info("MemberRepository.removeLectureById() called");
+    @Transactional(readOnly = true)
+    public Member findMemberById(Long id) {
+        log.info("MemberRepository.findMemberById() called");
 
-        return lectureDao.removeLectureById(member, lectureId);
+        Member member = em.find(Member.class, id);
+        if (member == null) {
+            throw new MemberNotExistException("해당 id를 가진 멤버가 없습니다.");
+        }
+
+        return member;
     }
 
     /**
@@ -132,18 +138,30 @@ public class MemberRepository {
     }
 
     /**
-     * PK를 통해 Member를 조회하는 메서드
+     * 강의를 id를 통해 삭제하는 메서드
+     * 다른 멤버의 강의는 삭제하지 못하게 함
      */
-    @Transactional(readOnly = true)
-    public Member findMemberById(Long id) {
-        log.info("MemberRepository.findMemberById() called");
+    public Lecture removeLectureById(Member member, Long lectureId) {
+        log.info("MemberRepository.removeLectureById() called");
 
-        Member member = em.find(Member.class, id);
-        if (member == null) {
-            throw new MemberNotExistException("해당 id를 가진 멤버가 없습니다.");
-        }
+        return lectureDao.removeLectureById(member, lectureId);
+    }
 
-        return member;
+    /**
+     * 강의 수정 메서드
+     */
+    public Lecture updateLecture(Member member, LectureUpdateRequestDto lectureDto) {
+        log.info("MemberRepository.updateLecture() called");
+
+        Lecture lecture = lectureDao.findLectureById(member, lectureDto.getId());
+
+        return lectureDao.updateLecture(
+                lecture,
+                lectureDto.getName(),
+                lectureDto.getCredit(),
+                lectureDto.getMajor(),
+                lectureDto.getSemester(),
+                lectureDto.getType());
     }
 
     /**

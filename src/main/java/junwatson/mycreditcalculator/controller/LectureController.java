@@ -2,9 +2,11 @@ package junwatson.mycreditcalculator.controller;
 
 import junwatson.mycreditcalculator.dto.request.LectureRegistrationRequestDto;
 import junwatson.mycreditcalculator.dto.request.LectureSearchRequestDto;
+import junwatson.mycreditcalculator.dto.request.LectureUpdateRequestDto;
 import junwatson.mycreditcalculator.dto.response.LectureInfoResponseDto;
 import junwatson.mycreditcalculator.exception.lecture.IllegalLectureTypeException;
 import junwatson.mycreditcalculator.exception.lecture.LectureNotExistException;
+import junwatson.mycreditcalculator.exception.member.MemberNotExistException;
 import junwatson.mycreditcalculator.service.LectureService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,6 +47,16 @@ public class LectureController {
         return ResponseEntity.ok(responseDto);
     }
 
+    @PatchMapping()
+    public ResponseEntity<LectureInfoResponseDto> updateLecture(@RequestBody LectureUpdateRequestDto requestDto, Principal principal) {
+        log.info("LectureController.updateLecture() called");
+
+        Long memberId = Long.parseLong(principal.getName());
+        LectureInfoResponseDto responseDto = lectureService.updateLecture(memberId, requestDto);
+
+        return ResponseEntity.ok(responseDto);
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<LectureInfoResponseDto> deleteLecture(@PathVariable Long id, Principal principal) {
         log.info("LectureController.deleteLecture() called");
@@ -63,6 +75,11 @@ public class LectureController {
         List<LectureInfoResponseDto> lectures = lectureService.searchLectures(memberId, requestDto);
 
         return ResponseEntity.ok(lectures);
+    }
+
+    @ExceptionHandler(MemberNotExistException.class)
+    public ResponseEntity<String> handleMemberNotExistException(MemberNotExistException exception) {
+        return ResponseEntity.status(NOT_FOUND).body(exception.getMessage());
     }
 
     @ExceptionHandler(LectureNotExistException.class)
