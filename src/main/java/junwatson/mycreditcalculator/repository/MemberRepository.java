@@ -162,15 +162,15 @@ public class MemberRepository {
 
         // 공백이 들어가면 불가능
         if (member.getEmail().contains(" ") ||
-            member.getName().contains(" ") ||
-            member.getPassword().contains(" ")) {
+                member.getName().contains(" ") ||
+                member.getPassword().contains(" ")) {
             return false;
         }
 
         // 영어나 숫자가 아니면서, 허용되지 않은 문자가 들어가면 불가능
         if (isIllegalString(member.getEmail()) ||
-            isIllegalString(member.getName()) ||
-            isIllegalString(member.getPassword())) {
+                isIllegalString(member.getName()) ||
+                isIllegalString(member.getPassword())) {
             return false;
         }
 
