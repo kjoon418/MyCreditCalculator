@@ -1,8 +1,8 @@
 package junwatson.mycreditcalculator.service;
 
 import junwatson.mycreditcalculator.domain.Member;
-import junwatson.mycreditcalculator.dto.request.MemberSignInRequestDto;
-import junwatson.mycreditcalculator.dto.request.MemberSignUpRequestDto;
+import junwatson.mycreditcalculator.dto.request.*;
+import junwatson.mycreditcalculator.dto.response.MemberInfoResponseDto;
 import junwatson.mycreditcalculator.dto.token.TokenDto;
 import junwatson.mycreditcalculator.exception.member.MemberNotExistException;
 import junwatson.mycreditcalculator.jwt.TokenProvider;
@@ -57,5 +57,32 @@ public class MemberService {
         String accessToken = tokenProvider.expireAccessToken(member);
 
         return TokenDto.from(accessToken);
+    }
+
+    public MemberInfoResponseDto updateMemberEmail(Long memberId, MemberUpdateEmailRequestDto memberDto) {
+        log.info("MemberService.updateMemberEmail() called");
+
+        Member member = repository.findMemberById(memberId);
+        Member updatedMember = repository.updateMemberEmail(member, memberDto.getEmail());
+
+        return MemberInfoResponseDto.from(updatedMember);
+    }
+
+    public MemberInfoResponseDto updateMemberPassword(Long memberId, MemberUpdatePasswordRequestDto memberDto) {
+        log.info("MemberService.updateMemberPassword() called");
+
+        Member member = repository.findMemberById(memberId);
+        Member updatedMember = repository.updateMemberPassword(member, memberDto.getPassword());
+
+        return MemberInfoResponseDto.from(updatedMember);
+    }
+
+    public MemberInfoResponseDto updateMemberName(Long memberId, MemberUpdateNameRequestDto memberDto) {
+        log.info("MemberService.updateMemberName() called");
+
+        Member member = repository.findMemberById(memberId);
+        Member updatedMember = repository.updateMemberName(member, memberDto.getName());
+
+        return MemberInfoResponseDto.from(updatedMember);
     }
 }

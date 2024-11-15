@@ -7,7 +7,6 @@ import junwatson.mycreditcalculator.dto.request.LectureRegistrationRequestDto;
 import junwatson.mycreditcalculator.dto.request.LectureUpdateRequestDto;
 import junwatson.mycreditcalculator.dto.request.MemberSignInRequestDto;
 import junwatson.mycreditcalculator.dto.request.MemberSignUpRequestDto;
-import junwatson.mycreditcalculator.dto.response.LectureInfoResponseDto;
 import junwatson.mycreditcalculator.dto.token.TokenDto;
 import junwatson.mycreditcalculator.exception.member.IllegalMemberStateException;
 import junwatson.mycreditcalculator.exception.member.MemberNotExistException;
@@ -40,7 +39,7 @@ public class MemberRepository {
         this.tokenProvider = tokenProvider;
         this.lectureDao = lectureDao;
 
-        char[] allowedWordsArr = {'!', '@', '#', '$', '%', '^', '&', '*'};
+        char[] allowedWordsArr = {'!', '@', '#', '$', '%', '^', '&', '*', '.'};
 
         for (char word : allowedWordsArr) {
             ALLOWED_WORDS.add(word);
@@ -55,7 +54,7 @@ public class MemberRepository {
 
         Member member = memberSignUpRequestDto.toEntity();
 
-        if (validate(member)) {
+        if (signUpValidate(member.getEmail(), member.getPassword(), member.getName())) {
             em.persist(member);
         } else {
             throw new IllegalMemberStateException("적합하지 않은 회원 정보입니다.");
@@ -97,6 +96,45 @@ public class MemberRepository {
         em.remove(member);
 
         return member;
+    }
+
+    /**
+     * 멤버 이메일 수정 메서드
+     */
+    public Member updateMemberEmail(Member member, String newEmail) {
+        log.info("MemberRepository.updateMemberEmail() called");
+
+        if (!validate(newEmail, member.getPassword(), member.getName())) {
+            throw new IllegalMemberStateException("해당 이메일을 이미 사용 중이거나, 이메일의 형식이 올바르지 않습니다.");
+        }
+
+        return member.update(newEmail, member.getPassword(), member.getName());
+    }
+
+    /**
+     * 멤버 비밀번호 수정 메서드
+     */
+    public Member updateMemberPassword(Member member, String newPassword) {
+        log.info("MemberRepository.updateMemberPassword() called");
+
+        if (!validate(member.getEmail(), newPassword, member.getName())) {
+            throw new IllegalMemberStateException("비밀번호의 형식이 올바르지 않습니다.");
+        }
+
+        return member.update(member.getEmail(), newPassword, member.getName());
+    }
+
+    /**
+     * 멤버 이름 수정 메서드
+     */
+    public Member updateMemberName(Member member, String newName) {
+        log.info("MemberRepository.updateMemberName() called");
+
+        if (!validate(member.getEmail(), member.getPassword(), newName)) {
+            throw new IllegalMemberStateException("이름의 형식이 올바르지 않습니다.");
+        }
+
+        return member.update(member.getEmail(), member.getPassword(), newName);
     }
 
     /**
@@ -167,33 +205,39 @@ public class MemberRepository {
     /**
      * 해당 회원 정보로 회원가입이 가능한지 유효성을 검사하는 메서드.
      */
-    private boolean validate(Member member) {
+    private boolean signUpValidate(String email, String password, String name) {
+        log.info("MemberRepository.signUpValidate() called");
+
+        validate(email, password, name);
+
+        // 해당 이메일로 가입한 회원이 이미 있는지 검사
+        return findMemberByEmail(email).isEmpty();
+    }
+
+    /**
+     * 해당 회원 정보로 회원 수정이 가능한지 유효성을 검사하는 메서드.
+     */
+    private boolean validate(String email, String password, String name) {
         log.info("MemberRepository.validate() called");
 
         // 이메일, 이름, 패스워드중 하나라도 null 있다면 불가능
-        if (member != null &&
-                !StringUtils.hasText(member.getEmail()) &&
-                !StringUtils.hasText(member.getName()) &&
-                !StringUtils.hasText(member.getPassword())) {
+        if (!StringUtils.hasText(email) &&
+                !StringUtils.hasText(password) &&
+                !StringUtils.hasText(name)) {
             return false;
         }
 
         // 공백이 들어가면 불가능
-        if (member.getEmail().contains(" ") ||
-                member.getName().contains(" ") ||
-                member.getPassword().contains(" ")) {
+        if (email.contains(" ") ||
+                password.contains(" ") ||
+                name.contains(" ")) {
             return false;
         }
 
         // 영어나 숫자가 아니면서, 허용되지 않은 문자가 들어가면 불가능
-        if (isIllegalString(member.getEmail()) ||
-                isIllegalString(member.getName()) ||
-                isIllegalString(member.getPassword())) {
-            return false;
-        }
-
-        // 해당 이메일로 가입한 회원이 이미 있는지 검사
-        return findMemberByEmail(member.getEmail()).isEmpty();
+        return !isIllegalString(email) &&
+                !isIllegalString(password) &&
+                !isIllegalString(name);
     }
 
     /**
