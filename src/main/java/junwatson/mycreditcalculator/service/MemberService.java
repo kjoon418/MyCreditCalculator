@@ -15,21 +15,20 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional
 public class MemberService {
 
     private final MemberRepository repository;
     private final TokenProvider tokenProvider;
 
-    @Transactional
+
     public TokenDto signUp(MemberSignUpRequestDto memberSignUpRequestDto) {
         log.info("MemberService.signUp() called");
 
         Member member = repository.signUp(memberSignUpRequestDto);
         String accessToken = tokenProvider.createAccessToken(member);
 
-        return TokenDto.builder()
-                .accessToken(accessToken)
-                .build();
+        return TokenDto.from(accessToken);
     }
 
     @Transactional(readOnly = true)
@@ -45,9 +44,18 @@ public class MemberService {
 
         Member member = repository.findMemberById(memberId);
         if (member == null) {
-            throw new MemberNotExistException("멤버가 조회되지 않습니다.");
+            throw new MemberNotExistException("회원이 조회되지 않습니다.");
         }
 
         return member;
+    }
+
+    public TokenDto deleteMemberById(Long memberId) {
+        log.info("MemberService.deleteMemberById() called");
+
+        Member member = repository.removeMemberById(memberId);
+        String accessToken = tokenProvider.expireAccessToken(member);
+
+        return TokenDto.from(accessToken);
     }
 }

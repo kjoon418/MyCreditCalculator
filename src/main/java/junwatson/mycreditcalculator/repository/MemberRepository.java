@@ -84,6 +84,21 @@ public class MemberRepository {
     }
 
     /**
+     * 멤버 삭제 메서드
+     */
+    public Member removeMemberById(Long memberId) {
+        log.info("MemberRepository.removeMemberById() called");
+
+        Member member = em.find(Member.class, memberId);
+        if (member == null) {
+            throw new MemberNotExistException("회원이 존재하지 않아 삭제에 실패했습니다.");
+        }
+        em.remove(member);
+
+        return member;
+    }
+
+    /**
      * 전체 강의를 조회하는 메서드
      */
     public List<Lecture> findLecturesByCondition(Member member, LectureSearchCondition condition) {

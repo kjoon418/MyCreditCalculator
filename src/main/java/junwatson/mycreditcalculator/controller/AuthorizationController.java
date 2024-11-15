@@ -62,6 +62,17 @@ public class AuthorizationController {
         return ResponseEntity.ok(tokenDto);
     }
 
+    @DeleteMapping("/withdraw")
+    public ResponseEntity<TokenDto> withdraw(Principal principal) {
+        log.info("AuthorizationController.withdraw() called");
+
+        long memberId = Long.parseLong(principal.getName());
+        TokenDto tokenDto = memberService.deleteMemberById(memberId);
+
+        return ResponseEntity.ok(tokenDto);
+    }
+
+
     @ExceptionHandler(IllegalTokenException.class)
     public ResponseEntity<String> handleIllegalTokenException(IllegalTokenException exception) {
         return ResponseEntity.status(FORBIDDEN).body(exception.getMessage());
