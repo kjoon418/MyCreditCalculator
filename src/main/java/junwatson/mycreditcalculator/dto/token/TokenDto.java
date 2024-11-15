@@ -10,9 +10,9 @@ import lombok.Getter;
 public class TokenDto {
     private String accessToken;
 
-    public static TokenDto from(String token) {
+    public static TokenDto from(String accessToken) {
         return TokenDto.builder()
-                .accessToken(token)
+                .accessToken(accessToken)
                 .build();
     }
 }
