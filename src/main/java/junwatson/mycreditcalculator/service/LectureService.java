@@ -67,7 +67,9 @@ public class LectureService {
         log.info("LectureService.registerLecture() called");
 
         Member member = repository.findMemberById(memberId);
-        return repository.registerLecture(member, lectureDto);
+        Lecture lecture = repository.registerLecture(member, lectureDto);
+
+        return LectureInfoResponseDto.from(lecture);
     }
 
     /**
@@ -78,6 +80,7 @@ public class LectureService {
 
         Member member = repository.findMemberById(memberId);
         Lecture deletedLecture = repository.removeLectureById(member, lectureId);
+
         return LectureInfoResponseDto.from(deletedLecture);
     }
 }

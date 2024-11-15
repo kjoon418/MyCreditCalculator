@@ -105,7 +105,7 @@ public class MemberRepository {
     /**
      * 강의를 등록하는 메서드
      */
-    public LectureInfoResponseDto registerLecture(Member member, LectureRegistrationRequestDto lectureDto) {
+    public Lecture registerLecture(Member member, LectureRegistrationRequestDto lectureDto) {
         log.info("MemberRepository.registerLecture() called");
 
         Lecture lecture = lectureDto.toEntityWithMember(member);
@@ -113,7 +113,7 @@ public class MemberRepository {
         // lecture 엔티티의 id값이 null인 상태로 DTO 객체를 만들지 않기 위해 플러시함
         em.flush();
 
-        return LectureInfoResponseDto.from(lecture);
+        return lecture;
     }
 
     /**
