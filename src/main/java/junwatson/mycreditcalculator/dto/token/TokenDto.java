@@ -9,4 +9,10 @@ import lombok.Getter;
 @AllArgsConstructor
 public class TokenDto {
     private String accessToken;
+
+    public static TokenDto from(String token) {
+        return TokenDto.builder()
+                .accessToken(token)
+                .build();
+    }
 }
