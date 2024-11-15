@@ -44,4 +44,17 @@ public class Member {
         this.name = name;
         this.role = role;
     }
+
+    /**
+     * 유저 엔티티를 수정하는 메서드<br>
+     * 사용 전 반드시 유효한 데이터인지 검증이 필요하다
+     */
+    public Member update(String email, String password, String name, MemberRole role) {
+        this.email = email;
+        this.password = password;
+        this.name = name;
+        this.role = role;
+
+        return this;
+    }
 }

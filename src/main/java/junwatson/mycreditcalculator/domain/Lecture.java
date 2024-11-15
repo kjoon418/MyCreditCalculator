@@ -45,4 +45,14 @@ public class Lecture {
         this.semester = semester;
         this.type = type;
     }
+
+    public Lecture update(String name, Double credit, String major, Integer semester, LectureType type) {
+        this.name = name;
+        this.credit = credit;
+        this.major = major;
+        this.semester = semester;
+        this.type = type;
+
+        return this;
+    }
 }
