@@ -6,6 +6,7 @@ import junwatson.mycreditcalculator.exception.lecture.LectureNotExistException;
 import junwatson.mycreditcalculator.service.CreditService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.PropertyValueException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -50,5 +51,10 @@ public class CreditController {
     @ExceptionHandler(IllegalLectureTypeException.class)
     public ResponseEntity<String> handIllegalLectureTypeException(IllegalLectureTypeException exception) {
         return ResponseEntity.status(BAD_REQUEST).body(exception.getMessage());
+    }
+
+    @ExceptionHandler(PropertyValueException.class)
+    public ResponseEntity<String> handlePropertyValueException(PropertyValueException exception) {
+        return ResponseEntity.status(BAD_REQUEST).body("잘못된 값 전달입니다.");
     }
 }
