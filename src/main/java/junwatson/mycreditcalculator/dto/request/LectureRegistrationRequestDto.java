@@ -3,7 +3,6 @@ package junwatson.mycreditcalculator.dto.request;
 import junwatson.mycreditcalculator.domain.Lecture;
 import junwatson.mycreditcalculator.domain.LectureType;
 import junwatson.mycreditcalculator.domain.Member;
-import junwatson.mycreditcalculator.exception.lecture.IllegalLectureTypeException;
 import lombok.Getter;
 
 @Getter

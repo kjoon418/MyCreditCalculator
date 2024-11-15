@@ -8,6 +8,7 @@ import lombok.Getter;
 @Builder
 @AllArgsConstructor
 public class TokenDto {
+
     private String accessToken;
 
     public static TokenDto from(String accessToken) {

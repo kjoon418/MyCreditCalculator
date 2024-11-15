@@ -9,6 +9,7 @@ import lombok.Getter;
 @Builder
 @Getter
 public class MemberInfoResponseDto {
+
     private String name;
 
     public static MemberInfoResponseDto from(Member member) {

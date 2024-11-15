@@ -5,6 +5,7 @@ import lombok.Getter;
 
 @Getter
 public class LectureSearchRequestDto {
+
     Integer semester;
     Boolean majorOnly;
 
