@@ -20,7 +20,7 @@ import java.security.Principal;
 import static org.springframework.http.HttpStatus.*;
 
 /**
- * 토큰 발급과 관련된 API를 처리하는 메서드
+ * 토큰 발급과 관련된 API를 처리하는 컨트롤러
  */
 @RestController
 @RequiredArgsConstructor
