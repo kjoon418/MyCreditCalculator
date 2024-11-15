@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.sql.SQLIntegrityConstraintViolationException;
 
 import static org.springframework.http.HttpStatus.*;
 
@@ -91,5 +92,10 @@ public class AuthorizationController {
     @ExceptionHandler(PropertyValueException.class)
     public ResponseEntity<String> handlePropertyValueException(PropertyValueException exception) {
         return ResponseEntity.status(BAD_REQUEST).body("잘못된 값 전달입니다.");
+    }
+
+    @ExceptionHandler(SQLIntegrityConstraintViolationException.class)
+    public ResponseEntity<String> handleSQLIntegrityConstraintViolationException(SQLIntegrityConstraintViolationException exception) {
+        return ResponseEntity.status(BAD_REQUEST).body("다른 회원이 이미 사용하고 있는 정보입니다.");
     }
 }

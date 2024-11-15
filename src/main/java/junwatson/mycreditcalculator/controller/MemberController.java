@@ -10,10 +10,12 @@ import junwatson.mycreditcalculator.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.PropertyValueException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.sql.SQLIntegrityConstraintViolationException;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -70,5 +72,10 @@ public class MemberController {
     @ExceptionHandler(PropertyValueException.class)
     public ResponseEntity<String> handlePropertyValueException(PropertyValueException exception) {
         return ResponseEntity.status(BAD_REQUEST).body("잘못된 값 전달입니다.");
+    }
+
+    @ExceptionHandler(SQLIntegrityConstraintViolationException.class)
+    public ResponseEntity<String> handleSQLIntegrityConstraintViolationException(SQLIntegrityConstraintViolationException exception) {
+        return ResponseEntity.status(BAD_REQUEST).body("다른 회원이 이미 사용하고 있는 정보입니다.");
     }
 }
