@@ -1,8 +1,10 @@
 package junwatson.mycreditcalculator.controller;
 
 import junwatson.mycreditcalculator.domain.Member;
+import junwatson.mycreditcalculator.dto.request.EmailValidityCheckRequestDto;
 import junwatson.mycreditcalculator.dto.request.MemberSignInRequestDto;
 import junwatson.mycreditcalculator.dto.request.MemberSignUpRequestDto;
+import junwatson.mycreditcalculator.dto.response.EmailValidityCheckResponseDto;
 import junwatson.mycreditcalculator.dto.token.TokenDto;
 import junwatson.mycreditcalculator.exception.member.IllegalMemberStateException;
 import junwatson.mycreditcalculator.exception.token.IllegalTokenException;
@@ -21,7 +23,7 @@ import java.sql.SQLIntegrityConstraintViolationException;
 import static org.springframework.http.HttpStatus.*;
 
 /**
- * 토큰 발급과 관련된 API를 처리하는 컨트롤러
+ * 토큰 발급과 관련된 API 및 인증이 필요 없는 API를 처리하는 컨트롤러
  */
 @RestController
 @RequiredArgsConstructor
@@ -47,6 +49,15 @@ public class AuthorizationController {
         TokenDto tokenDto = memberService.signIn(memberDto);
 
         return ResponseEntity.ok(tokenDto);
+    }
+
+    @GetMapping("/authorization/email")
+    public ResponseEntity<EmailValidityCheckResponseDto> emailValidityCheck(@RequestBody EmailValidityCheckRequestDto requestDto) {
+        log.info("MemberController.emailExistsCheck() called");
+
+        EmailValidityCheckResponseDto responseDto = memberService.emailValidityCheck(requestDto);
+
+        return ResponseEntity.ok(responseDto);
     }
 
     @GetMapping("/expire")

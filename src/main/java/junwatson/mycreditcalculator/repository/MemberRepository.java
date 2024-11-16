@@ -243,7 +243,7 @@ public class MemberRepository {
     /**
      * 해당 String이 영어나 숫자가 아니면서 허용되지 않은 문자를 포함하는지 확인하는 메서드
      */
-    private boolean isIllegalString(String string) {
+    public boolean isIllegalString(String string) {
         for (int i = 0; i < string.length(); i++) {
             char word = string.charAt(i);
             if (Character.isAlphabetic(word)) {
@@ -264,7 +264,7 @@ public class MemberRepository {
      * 일치하는 이메일을 가진 데이터가 DB에 있는지 조회하는 메서드
      */
     @Transactional(readOnly = true)
-    protected List<Member> findMemberByEmail(String email) {
+    public List<Member> findMemberByEmail(String email) {
         log.info("MemberRepository.findMemberByEmail() called");
 
         String jpql = "select m from Member m where m.email=:email";

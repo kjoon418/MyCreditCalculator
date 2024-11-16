@@ -2,8 +2,10 @@ package junwatson.mycreditcalculator.service;
 
 import junwatson.mycreditcalculator.domain.Member;
 import junwatson.mycreditcalculator.dto.request.*;
+import junwatson.mycreditcalculator.dto.response.EmailValidityCheckResponseDto;
 import junwatson.mycreditcalculator.dto.response.MemberInfoResponseDto;
 import junwatson.mycreditcalculator.dto.token.TokenDto;
+import junwatson.mycreditcalculator.exception.member.IllegalMemberStateException;
 import junwatson.mycreditcalculator.exception.member.MemberNotExistException;
 import junwatson.mycreditcalculator.jwt.TokenProvider;
 import junwatson.mycreditcalculator.repository.MemberRepository;
@@ -48,6 +50,23 @@ public class MemberService {
         }
 
         return member;
+    }
+
+    @Transactional(readOnly = true)
+    public EmailValidityCheckResponseDto emailValidityCheck(EmailValidityCheckRequestDto requestDto) {
+        log.info("MemberService.isEmailExists() called");
+
+        String email = requestDto.getEmail();
+
+        if (repository.isIllegalString(email)) {
+            throw new IllegalMemberStateException("유효하지 않은 이메일입니다.");
+        }
+
+        if (!repository.findMemberByEmail(email).isEmpty()) {
+            throw new IllegalMemberStateException("이미 존재하는 이메일입니다.");
+        }
+
+        return EmailValidityCheckResponseDto.from(email);
     }
 
     public TokenDto deleteMemberById(Long memberId) {
