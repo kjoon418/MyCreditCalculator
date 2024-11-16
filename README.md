@@ -6,6 +6,7 @@
 |---|---|---|---|---|---|
 |/authorization|POST|false|email: 이메일<br>password: 비밀번호<br>name: 유저명|JWT 토큰|회원 가입|
 |/authorization|GET|false|email: 이메일<br>password: 비밀번호|JWT 토큰|로그인|
+|/authorization/email|GET|false|email: 이메일|email: 이메일|이메일 사용 가능 여부(유효성) 확인|
 |/expire|GET|true|없음|기간이 만료된 JWT 토큰|로그아웃|
 |/withdraw|DELETE|true|없음|기간이 만료된 JWT 토큰|회원 삭제|
 |/member/email|PATCH|true|email: 이메일|name: 이름|이메일 변경|
