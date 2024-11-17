@@ -106,12 +106,12 @@ public class AuthorizationController {
     }
 
     @ExceptionHandler(PropertyValueException.class)
-    public ResponseEntity<String> handlePropertyValueException(PropertyValueException exception) {
+    public ResponseEntity<String> handlePropertyValueException() {
         return ResponseEntity.status(BAD_REQUEST).body("잘못된 값 전달입니다.");
     }
 
     @ExceptionHandler(SQLIntegrityConstraintViolationException.class)
-    public ResponseEntity<String> handleSQLIntegrityConstraintViolationException(SQLIntegrityConstraintViolationException exception) {
+    public ResponseEntity<String> handleSQLIntegrityConstraintViolationException() {
         return ResponseEntity.status(BAD_REQUEST).body("다른 회원이 이미 사용하고 있는 정보입니다.");
     }
 }

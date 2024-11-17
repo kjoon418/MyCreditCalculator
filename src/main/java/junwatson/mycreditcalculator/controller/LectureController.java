@@ -93,7 +93,7 @@ public class LectureController {
     }
 
     @ExceptionHandler(PropertyValueException.class)
-    public ResponseEntity<String> handlePropertyValueException(PropertyValueException exception) {
+    public ResponseEntity<String> handlePropertyValueException() {
         return ResponseEntity.status(BAD_REQUEST).body("잘못된 값 전달입니다.");
     }
 }
