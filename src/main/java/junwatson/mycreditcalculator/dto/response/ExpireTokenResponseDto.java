@@ -1,4 +1,4 @@
-package junwatson.mycreditcalculator.dto.token;
+package junwatson.mycreditcalculator.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,12 +7,12 @@ import lombok.Getter;
 @Getter
 @Builder
 @AllArgsConstructor
-public class TokenDto {
+public class ExpireTokenResponseDto {
 
     private String accessToken;
 
-    public static TokenDto from(String accessToken) {
-        return TokenDto.builder()
+    public static ExpireTokenResponseDto of(String accessToken) {
+        return ExpireTokenResponseDto.builder()
                 .accessToken(accessToken)
                 .build();
     }

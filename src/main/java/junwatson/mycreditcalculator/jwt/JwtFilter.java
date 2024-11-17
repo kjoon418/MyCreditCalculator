@@ -30,7 +30,7 @@ public class JwtFilter extends GenericFilterBean {
         String token = tokenProvider.resolveToken((HttpServletRequest) request);
 
         // 토큰이 적합한지 확인한다
-        if (StringUtils.hasText(token) && tokenProvider.validateToken(token)) {
+        if (StringUtils.hasText(token) && tokenProvider.validateToken(token) && tokenProvider.hasProperTokenType(token, TokenType.ACCESS)) {
             Authentication authentication = tokenProvider.getAuthentication(token);
 
             // 사용자의 권한 정보를 SecurityContextHolder에 저장한다

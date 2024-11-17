@@ -26,6 +26,7 @@ public class TokenProvider {
     private static final String ROLE_CLAIM = "ROLE";
     private static final String BEARER = "Bearer ";
     private static final String AUTHORIZATION = "Authorization";
+    private static final String TOKEN_TYPE_CLAIM = "JunWatson/TokenType";
 
     private final Key key;
     private final long accessTokenValidityTime;
@@ -46,10 +47,23 @@ public class TokenProvider {
         return Jwts.builder()
                 // 토큰 제목(sub 클레임)을 지정한다
                 .setSubject(member.getId().toString())
-                // 클레임을 추가함 - "Role":"멤버의 ID"
                 .claim(ROLE_CLAIM, member.getRole())
+                .claim(TOKEN_TYPE_CLAIM, TokenType.ACCESS)
                 .setExpiration(accessTokenExpiredTime)
                 // HS256 알고리즘과 시크릿 키를 통해 시그니처를 생성함
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    public String createRefreshToken(Member member) {
+        long nowTime = new Date().getTime();
+        Date accessTokenExpiredTime = new Date(nowTime + (accessTokenValidityTime * 24));
+
+        return Jwts.builder()
+                .setSubject(member.getId().toString())
+                .claim(ROLE_CLAIM, member.getRole())
+                .claim(TOKEN_TYPE_CLAIM, TokenType.REFRESH)
+                .setExpiration(accessTokenExpiredTime)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -128,7 +142,7 @@ public class TokenProvider {
         }
     }
 
-    public String expireAccessToken(Member member) {
+    public String expireToken(Member member) {
         Date accessTokenExpiredTime = new Date();
 
         return Jwts.builder()
@@ -140,5 +154,12 @@ public class TokenProvider {
                 // HS256 알고리즘과 시크릿 키를 통해 시그니처를 생성함
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
+    }
+
+    public boolean hasProperTokenType(String token, TokenType tokenType) {
+        Claims claims = parseClaims(token);
+        String tokenTypeClaim = (String) claims.get(TOKEN_TYPE_CLAIM);
+
+        return tokenType == TokenType.valueOf(tokenTypeClaim);
     }
 }

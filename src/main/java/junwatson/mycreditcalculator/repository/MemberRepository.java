@@ -3,22 +3,22 @@ package junwatson.mycreditcalculator.repository;
 import jakarta.persistence.EntityManager;
 import junwatson.mycreditcalculator.domain.Lecture;
 import junwatson.mycreditcalculator.domain.Member;
-import junwatson.mycreditcalculator.dto.request.LectureRegistrationRequestDto;
-import junwatson.mycreditcalculator.dto.request.LectureUpdateRequestDto;
-import junwatson.mycreditcalculator.dto.request.MemberSignInRequestDto;
-import junwatson.mycreditcalculator.dto.request.MemberSignUpRequestDto;
-import junwatson.mycreditcalculator.dto.token.TokenDto;
+import junwatson.mycreditcalculator.domain.RefreshToken;
+import junwatson.mycreditcalculator.dto.request.*;
+import junwatson.mycreditcalculator.dto.response.CreateTokenResponseDto;
 import junwatson.mycreditcalculator.exception.member.IllegalMemberStateException;
 import junwatson.mycreditcalculator.exception.member.MemberNotExistException;
 import junwatson.mycreditcalculator.jwt.TokenProvider;
 import junwatson.mycreditcalculator.repository.dao.LectureDao;
 import junwatson.mycreditcalculator.repository.dao.LectureSearchCondition;
+import junwatson.mycreditcalculator.repository.dao.RefreshTokenDao;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.security.Principal;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -31,13 +31,15 @@ public class MemberRepository {
     private final EntityManager em;
     private final TokenProvider tokenProvider;
     private final LectureDao lectureDao;
+    private final RefreshTokenDao refreshTokenDao;
     private final HashSet<Character> ALLOWED_WORDS = new HashSet<>();
 
     @Autowired
-    public MemberRepository(EntityManager em, TokenProvider tokenProvider, LectureDao lectureDao) {
+    public MemberRepository(EntityManager em, TokenProvider tokenProvider, LectureDao lectureDao, RefreshTokenDao refreshTokenDao) {
         this.em = em;
         this.tokenProvider = tokenProvider;
         this.lectureDao = lectureDao;
+        this.refreshTokenDao = refreshTokenDao;
 
         char[] allowedWordsArr = {'!', '@', '#', '$', '%', '^', '&', '*', '.'};
 
@@ -67,19 +69,20 @@ public class MemberRepository {
      * 로그인 메서드
      */
     @Transactional(readOnly = true)
-    public TokenDto signIn(MemberSignInRequestDto memberSignInRequestDto) {
+    public CreateTokenResponseDto signIn(MemberSignInRequestDto memberSignInRequestDto) {
         log.info("MemberRepository.signIn() called");
 
-        Member member = memberSignInRequestDto.toEntity();
-        Optional<Member> findMembers = findMemberByEmailAndPassword(member.getEmail(), member.getPassword())
+        Optional<Member> findMembers = findMemberByEmailAndPassword(memberSignInRequestDto.getEmail(), memberSignInRequestDto.getPassword())
                 .stream()
                 .findFirst();
-        Member findMember = findMembers.orElseThrow(() -> new MemberNotExistException("아이디 혹은 비밀번호가 틀립니다."));
+        Member member = findMembers.orElseThrow(() -> new MemberNotExistException("아이디 혹은 비밀번호가 틀립니다."));
 
-        String accessToken = tokenProvider.createAccessToken(findMember);
+        String accessToken = tokenProvider.createAccessToken(member);
+        RefreshToken refreshToken = refreshTokenDao.createRefreshToken(member);
 
-        return TokenDto.builder()
+        return CreateTokenResponseDto.builder()
                 .accessToken(accessToken)
+                .refreshToken(refreshToken.getToken())
                 .build();
     }
 
@@ -200,6 +203,24 @@ public class MemberRepository {
                 lectureDto.getMajor(),
                 lectureDto.getSemester(),
                 lectureDto.getType());
+    }
+
+    public Member findMemberByPrincipal(Principal principal) {
+        long memberId = Long.parseLong(principal.getName());
+
+        return em.find(Member.class, memberId);
+    }
+
+    public String createAccessToken(Member member) {
+        return tokenProvider.createAccessToken(member);
+    }
+
+    public RefreshToken createRefreshToken(Member member) {
+        return refreshTokenDao.createRefreshToken(member);
+    }
+
+    public boolean isValidRefreshToken(Member member, String refreshTokenString) {
+        return refreshTokenDao.isValidateRefreshToken(member, refreshTokenString);
     }
 
     /**

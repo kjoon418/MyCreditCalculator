@@ -1,15 +1,16 @@
 package junwatson.mycreditcalculator.controller;
 
-import junwatson.mycreditcalculator.domain.Member;
+import jakarta.servlet.http.HttpServletRequest;
 import junwatson.mycreditcalculator.dto.request.EmailValidityCheckRequestDto;
 import junwatson.mycreditcalculator.dto.request.MemberSignInRequestDto;
 import junwatson.mycreditcalculator.dto.request.MemberSignUpRequestDto;
 import junwatson.mycreditcalculator.dto.response.EmailValidityCheckResponseDto;
-import junwatson.mycreditcalculator.dto.token.TokenDto;
+import junwatson.mycreditcalculator.dto.response.CreateTokenResponseDto;
+import junwatson.mycreditcalculator.dto.response.ExpireTokenResponseDto;
+import junwatson.mycreditcalculator.dto.response.ReissueTokenResponseDto;
 import junwatson.mycreditcalculator.exception.member.IllegalMemberStateException;
 import junwatson.mycreditcalculator.exception.token.IllegalTokenException;
 import junwatson.mycreditcalculator.exception.member.MemberNotExistException;
-import junwatson.mycreditcalculator.jwt.TokenProvider;
 import junwatson.mycreditcalculator.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,24 +32,32 @@ import static org.springframework.http.HttpStatus.*;
 public class AuthorizationController {
 
     private final MemberService memberService;
-    private final TokenProvider tokenProvider;
 
     @PostMapping("/authorization")
-    public ResponseEntity<TokenDto> signUp(@RequestBody MemberSignUpRequestDto memberDto) {
+    public ResponseEntity<CreateTokenResponseDto> signUp(@RequestBody MemberSignUpRequestDto requestDto) {
         log.info("AuthorizationController.signUp() called");
 
-        TokenDto tokenDto = memberService.signUp(memberDto);
+        CreateTokenResponseDto createTokenResponseDto = memberService.signUp(requestDto);
 
-        return ResponseEntity.status(CREATED).body(tokenDto);
+        return ResponseEntity.status(CREATED).body(createTokenResponseDto);
     }
 
     @GetMapping("/authorization")
-    public ResponseEntity<TokenDto> signIn(@RequestBody MemberSignInRequestDto memberDto) {
+    public ResponseEntity<CreateTokenResponseDto> signIn(@RequestBody MemberSignInRequestDto requestDto) {
         log.info("AuthorizationController.signIn() called");
 
-        TokenDto tokenDto = memberService.signIn(memberDto);
+        CreateTokenResponseDto createTokenResponseDto = memberService.signIn(requestDto);
 
-        return ResponseEntity.ok(tokenDto);
+        return ResponseEntity.ok(createTokenResponseDto);
+    }
+
+    @GetMapping("/authorization/reissue")
+    public ResponseEntity<ReissueTokenResponseDto> reissueAccessToken(HttpServletRequest request) {
+        log.info("AuthorizationController.reissueAccessToken() called");
+
+        ReissueTokenResponseDto responseDto = memberService.reissueAccessToken(request);
+
+        return ResponseEntity.ok(responseDto);
     }
 
     @GetMapping("/authorization/email")
@@ -61,27 +70,23 @@ public class AuthorizationController {
     }
 
     @GetMapping("/expire")
-    public ResponseEntity<TokenDto> logout(Principal principal) {
+    public ResponseEntity<ExpireTokenResponseDto> logout(Principal principal) {
         log.info("AuthorizationController.logout() called");
 
         Long memberId = Long.parseLong(principal.getName());
-        Member member = memberService.findMemberById(memberId);
-        String token = tokenProvider.expireAccessToken(member);
-        TokenDto tokenDto = TokenDto.builder()
-                .accessToken(token)
-                .build();
+        ExpireTokenResponseDto responseDto = memberService.expireTokens(memberId);
 
-        return ResponseEntity.ok(tokenDto);
+        return ResponseEntity.ok(responseDto);
     }
 
     @DeleteMapping("/withdraw")
-    public ResponseEntity<TokenDto> withdraw(Principal principal) {
+    public ResponseEntity<ExpireTokenResponseDto> withdraw(Principal principal) {
         log.info("AuthorizationController.withdraw() called");
 
         long memberId = Long.parseLong(principal.getName());
-        TokenDto tokenDto = memberService.deleteMemberById(memberId);
+        ExpireTokenResponseDto responseDto = memberService.deleteMemberById(memberId);
 
-        return ResponseEntity.ok(tokenDto);
+        return ResponseEntity.ok(responseDto);
     }
 
 
