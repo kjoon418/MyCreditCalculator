@@ -1,14 +1,15 @@
 # 학점 계산기
-빠른 시일 내로 기능 추가 및, Refresh 토큰 추가 예정
-
+리프레시 토큰 추가 완료
 ## API 명세서
-|경로|METHOD|인증 필요 어부|전달해야 할 값(name: value)|반환되는 값|설명|
+인증이 필요할 경우, Authorization 헤더에 Access token을 같이 담아 보내야 한다.
+|경로|METHOD|인증 필요 여부|전달해야 할 값(name: value)|반환되는 값|설명|
 |---|---|---|---|---|---|
-|/authorization|POST|false|email: 이메일<br>password: 비밀번호<br>name: 유저명|JWT 토큰|회원 가입|
-|/authorization|GET|false|email: 이메일<br>password: 비밀번호|JWT 토큰|로그인|
+|/authorization|POST|false|email: 이메일<br>password: 비밀번호<br>name: 유저명|accessToken: 엑세스 토큰<br>refreshToken: 리프레시 토큰|회원 가입|
+|/authorization|GET|false|email: 이메일<br>password: 비밀번호|accessToken: 엑세스 토큰<br>refreshToken: 리프레시 토큰|로그인|
+|/authorization/reissue|GET|false|없음|accessToken: 엑세스 토큰|엑세스 토큰 재발급|
 |/authorization/email|GET|false|email: 이메일|email: 이메일|이메일 사용 가능 여부(유효성) 확인|
-|/expire|GET|true|없음|기간이 만료된 JWT 토큰|로그아웃|
-|/withdraw|DELETE|true|없음|기간이 만료된 JWT 토큰|회원 삭제|
+|/expire|GET|true|없음|accessToken: 기간이 만료된 엑세스 토큰|로그아웃|
+|/withdraw|DELETE|true|없음|accessToken: 기간이 만료된 엑세스 토큰|회원 삭제|
 |/member/email|PATCH|true|email: 이메일|name: 이름|이메일 변경|
 |/member/password|PATCH|true|password: 비밀번호|name: 이름|비밀번호 변경|
 |/member/name|PATCH|true|name: 이름|name: 이름|이름 변경|
