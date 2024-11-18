@@ -210,16 +210,22 @@ public class MemberRepository {
     }
 
     public Member findMemberByPrincipal(Principal principal) {
+        log.info("MemberRepository.findMemberByPrincipal() called");
+
         long memberId = Long.parseLong(principal.getName());
 
         return em.find(Member.class, memberId);
     }
 
     public String createAccessToken(Member member) {
+        log.info("MemberRepository.createAccessToken() called");
+
         return tokenProvider.createAccessToken(member);
     }
 
     public RefreshToken createRefreshToken(Member member) {
+        log.info("MemberRepository.createRefreshToken() called");
+
         return refreshTokenDao.createRefreshToken(member);
     }
 
@@ -227,6 +233,8 @@ public class MemberRepository {
      * 리프레쉬 토큰의 유효성을 검사하고, 유효할 경우 토큰을 반환하는 메서드
      */
     public String reissueAccessToken(HttpServletRequest request) {
+        log.info("MemberRepository.reissueAccessToken() called");
+
         // 리프레쉬 토큰의 유효성 검사
         String refreshToken = tokenProvider.resolveToken(request);
         Claims claims = tokenProvider.parseClaims(refreshToken);
@@ -285,6 +293,8 @@ public class MemberRepository {
      * 해당 String이 영어나 숫자가 아니면서 허용되지 않은 문자를 포함하는지 확인하는 메서드
      */
     public boolean isIllegalString(String string) {
+        log.info("MemberRepository.isIllegalString() called");
+
         for (int i = 0; i < string.length(); i++) {
             char word = string.charAt(i);
             if (Character.isAlphabetic(word)) {

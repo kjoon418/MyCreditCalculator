@@ -1,18 +1,15 @@
 package junwatson.mycreditcalculator.repository.dao;
 
-import jakarta.persistence.EntityManager;
 import junwatson.mycreditcalculator.domain.Lecture;
 import junwatson.mycreditcalculator.domain.LectureType;
 import junwatson.mycreditcalculator.domain.Member;
 import junwatson.mycreditcalculator.exception.lecture.LectureNotExistException;
-import junwatson.mycreditcalculator.exception.member.IllegalMemberStateException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -38,6 +35,8 @@ public class LectureDao {
      * id를 통해 강의를 조회하는 메서드
      */
     public Lecture findLectureById(Member member, Long lectureId) {
+        log.info("LectureDao.findLectureById() called");
+
         return member.getLectures().stream()
                 .filter(lecture -> lecture.getId().equals(lectureId))
                 .findAny()
@@ -48,6 +47,8 @@ public class LectureDao {
      * 강의를 수정하는 메서드
      */
     public Lecture updateLecture(Lecture lecture, String name, Double credit, String major, Integer semester, LectureType type) {
+        log.info("LectureDao.updateLecture() called");
+
         return lecture.update(name, credit, major, semester, type);
     }
 
