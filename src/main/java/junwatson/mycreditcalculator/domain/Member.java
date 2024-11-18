@@ -23,7 +23,8 @@ public class Member {
     private List<Lecture> lectures = new ArrayList<>();
 
     @Setter
-    @OneToOne(mappedBy = "member",  cascade = ALL, orphanRemoval = true, fetch = LAZY)
+    @OneToOne(cascade = ALL, orphanRemoval = true, fetch = LAZY)
+    @JoinColumn
     RefreshToken refreshToken;
 
     @Column(nullable = false, unique = true)

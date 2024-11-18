@@ -1,6 +1,5 @@
 package junwatson.mycreditcalculator.service;
 
-import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import junwatson.mycreditcalculator.domain.Member;
 import junwatson.mycreditcalculator.domain.RefreshToken;
@@ -8,18 +7,12 @@ import junwatson.mycreditcalculator.dto.request.*;
 import junwatson.mycreditcalculator.dto.response.*;
 import junwatson.mycreditcalculator.exception.member.IllegalMemberStateException;
 import junwatson.mycreditcalculator.exception.member.MemberNotExistException;
-import junwatson.mycreditcalculator.exception.token.IllegalTokenException;
 import junwatson.mycreditcalculator.jwt.TokenProvider;
-import junwatson.mycreditcalculator.jwt.TokenType;
 import junwatson.mycreditcalculator.repository.MemberRepository;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.security.Principal;
 
 @Service
 @RequiredArgsConstructor
@@ -41,7 +34,7 @@ public class MemberService {
         return CreateTokenResponseDto.of(accessToken, refreshToken.getToken());
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public CreateTokenResponseDto signIn(MemberSignInRequestDto memberSignInRequestDto) {
         log.info("MemberService.signIn() called");
 
@@ -63,19 +56,9 @@ public class MemberService {
     public ReissueTokenResponseDto reissueAccessToken(HttpServletRequest request) {
         log.info("MemberService.reissueAccessToken() called");
 
-        // 리프레쉬 토큰의 유효성 검사
-        String token = tokenProvider.resolveToken(request);
-        if (tokenProvider.validateToken(token) && tokenProvider.hasProperTokenType(token, TokenType.REFRESH)) {
-            Claims claims = tokenProvider.parseClaims(token);
-            long memberId = Long.parseLong(claims.getSubject());
-            Member member = memberRepository.findMemberById(memberId);
+        String accessToken = memberRepository.reissueAccessToken(request);
 
-            String accessToken = tokenProvider.createAccessToken(member);
-
-            return ReissueTokenResponseDto.from(accessToken);
-        }
-
-        throw new IllegalTokenException("유효하지 않은 리프레시 토큰입니다.");
+        return ReissueTokenResponseDto.from(accessToken);
     }
 
     public ExpireTokenResponseDto expireTokens(Long memberId) {

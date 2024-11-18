@@ -14,8 +14,7 @@ public class RefreshToken {
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    @OneToOne
-    @JoinColumn(name = "member_id")
+    @OneToOne(mappedBy = "refreshToken")
     private Member member;
 
     @Setter

@@ -1,6 +1,8 @@
 package junwatson.mycreditcalculator.repository;
 
+import io.jsonwebtoken.Claims;
 import jakarta.persistence.EntityManager;
+import jakarta.servlet.http.HttpServletRequest;
 import junwatson.mycreditcalculator.domain.Lecture;
 import junwatson.mycreditcalculator.domain.Member;
 import junwatson.mycreditcalculator.domain.RefreshToken;
@@ -8,7 +10,9 @@ import junwatson.mycreditcalculator.dto.request.*;
 import junwatson.mycreditcalculator.dto.response.CreateTokenResponseDto;
 import junwatson.mycreditcalculator.exception.member.IllegalMemberStateException;
 import junwatson.mycreditcalculator.exception.member.MemberNotExistException;
+import junwatson.mycreditcalculator.exception.token.IllegalTokenException;
 import junwatson.mycreditcalculator.jwt.TokenProvider;
+import junwatson.mycreditcalculator.jwt.TokenType;
 import junwatson.mycreditcalculator.repository.dao.LectureDao;
 import junwatson.mycreditcalculator.repository.dao.LectureSearchCondition;
 import junwatson.mycreditcalculator.repository.dao.RefreshTokenDao;
@@ -68,7 +72,7 @@ public class MemberRepository {
     /**
      * 로그인 메서드
      */
-    @Transactional(readOnly = true)
+    @Transactional
     public CreateTokenResponseDto signIn(MemberSignInRequestDto memberSignInRequestDto) {
         log.info("MemberRepository.signIn() called");
 
@@ -219,8 +223,24 @@ public class MemberRepository {
         return refreshTokenDao.createRefreshToken(member);
     }
 
-    public boolean isValidRefreshToken(Member member, String refreshTokenString) {
-        return refreshTokenDao.isValidateRefreshToken(member, refreshTokenString);
+    /**
+     * 리프레쉬 토큰의 유효성을 검사하고, 유효할 경우 토큰을 반환하는 메서드
+     */
+    public String reissueAccessToken(HttpServletRequest request) {
+        // 리프레쉬 토큰의 유효성 검사
+        String refreshToken = tokenProvider.resolveToken(request);
+        Claims claims = tokenProvider.parseClaims(refreshToken);
+        long memberId = Long.parseLong(claims.getSubject());
+        Member member = findMemberById(memberId);
+
+        if (tokenProvider.validateToken(refreshToken) &&
+                tokenProvider.hasProperTokenType(refreshToken, TokenType.REFRESH) &&
+                refreshTokenDao.isValidateRefreshToken(member, refreshToken)) {
+
+            return tokenProvider.createAccessToken(member);
+        }
+
+        throw new IllegalTokenException("유효하지 않은 리프레시 토큰입니다.");
     }
 
     /**
