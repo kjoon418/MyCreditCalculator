@@ -4,13 +4,16 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
+import static lombok.AccessLevel.*;
+
 /**
  * 강의 검색을 위한 조건을 담는 객체
  */
 @Getter
-@AllArgsConstructor
+@AllArgsConstructor(access = PRIVATE)
 @Builder
 public class LectureSearchCondition {
+
     Integer semester;
     boolean majorOnly;
 
