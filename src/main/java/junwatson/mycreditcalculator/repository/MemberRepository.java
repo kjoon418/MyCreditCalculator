@@ -235,20 +235,16 @@ public class MemberRepository {
     public String reissueAccessToken(HttpServletRequest request) {
         log.info("MemberRepository.reissueAccessToken() called");
 
-        // 리프레쉬 토큰의 유효성 검사
-        String refreshToken = tokenProvider.resolveToken(request);
-        Claims claims = tokenProvider.parseClaims(refreshToken);
+        String refreshTokenString = tokenProvider.resolveToken(request);
+        Claims claims = tokenProvider.parseClaims(refreshTokenString);
         long memberId = Long.parseLong(claims.getSubject());
         Member member = findMemberById(memberId);
 
-        if (tokenProvider.validateToken(refreshToken) &&
-                tokenProvider.hasProperTokenType(refreshToken, TokenType.REFRESH) &&
-                refreshTokenDao.isValidateRefreshToken(member, refreshToken)) {
-
-            return tokenProvider.createAccessToken(member);
+        if (!refreshTokenDao.isValidateRefreshToken(member, refreshTokenString)) {
+            throw new IllegalTokenException("유효하지 않은 리프레시 토큰입니다.");
         }
 
-        throw new IllegalTokenException("유효하지 않은 리프레시 토큰입니다.");
+        return tokenProvider.createAccessToken(member);
     }
 
     /**

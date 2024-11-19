@@ -2,7 +2,9 @@ package junwatson.mycreditcalculator.repository.dao;
 
 import junwatson.mycreditcalculator.domain.Member;
 import junwatson.mycreditcalculator.domain.RefreshToken;
+import junwatson.mycreditcalculator.exception.token.IllegalTokenException;
 import junwatson.mycreditcalculator.jwt.TokenProvider;
+import junwatson.mycreditcalculator.jwt.TokenType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
@@ -19,7 +21,9 @@ public class RefreshTokenDao {
     public boolean isValidateRefreshToken(Member member, String refreshTokenString) {
         log.info("RefreshTokenDao.isValidateRefreshToken() called");
 
-        if (member.getRefreshToken() == null) {
+        if (member.getRefreshToken() == null ||
+                !tokenProvider.validateToken(refreshTokenString) ||
+                !tokenProvider.hasProperTokenType(refreshTokenString, TokenType.REFRESH)) {
             return false;
         }
 
