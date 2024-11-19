@@ -6,7 +6,7 @@
 |---|---|---|---|---|---|
 |/authorization|POST|false|email: 이메일<br>password: 비밀번호<br>name: 유저명|accessToken: 엑세스 토큰<br>refreshToken: 리프레시 토큰|회원 가입|
 |/authorization|GET|false|email: 이메일<br>password: 비밀번호|accessToken: 엑세스 토큰<br>refreshToken: 리프레시 토큰|로그인|
-|/authorization/reissue|GET|false|없음|accessToken: 엑세스 토큰|엑세스 토큰 재발급|
+|/authorization/reissue|GET|true<br>(Access Token 대신 Refresh Token을 담아 보내야 함)|없음|accessToken: 엑세스 토큰|엑세스 토큰 재발급|
 |/authorization/email|GET|false|email: 이메일|email: 이메일|이메일 사용 가능 여부(유효성) 확인|
 |/expire|GET|true|없음|accessToken: 기간이 만료된 엑세스 토큰|로그아웃|
 |/withdraw|DELETE|true|없음|accessToken: 기간이 만료된 엑세스 토큰|회원 삭제|
