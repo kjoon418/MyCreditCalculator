@@ -21,7 +21,7 @@ public class RefreshToken {
     private String token;
 
     @Builder
-    public RefreshToken(Member member, String token) {
+    private RefreshToken(Member member, String token) {
         this.member = member;
         if (member != null) {
             member.setRefreshToken(this);
