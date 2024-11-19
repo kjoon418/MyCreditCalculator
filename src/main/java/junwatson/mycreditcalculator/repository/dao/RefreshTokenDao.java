@@ -28,7 +28,6 @@ public class RefreshTokenDao {
                 .equals(refreshTokenString);
     }
 
-    @Transactional
     public RefreshToken createRefreshToken(Member member) {
         log.info("RefreshTokenDao.createRefreshToken() called");
 
