@@ -120,7 +120,7 @@ public class TokenProvider {
                     .parseClaimsJws(token);
             // 예외가 발생하지 않았다면 적합한 토큰이므로 true를 반환함
             return true;
-        } catch (UnsupportedJwtException | ExpiredJwtException | IllegalArgumentException e) {
+        } catch (UnsupportedJwtException | ExpiredJwtException | IllegalArgumentException | MalformedJwtException e) {
             // 위 예외가 발생했다면 적합하지 않은 토큰이므로 false를 반환함
             return false;
         }
