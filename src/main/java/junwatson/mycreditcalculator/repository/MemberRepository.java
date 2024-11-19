@@ -12,7 +12,6 @@ import junwatson.mycreditcalculator.exception.member.IllegalMemberStateException
 import junwatson.mycreditcalculator.exception.member.MemberNotExistException;
 import junwatson.mycreditcalculator.exception.token.IllegalTokenException;
 import junwatson.mycreditcalculator.jwt.TokenProvider;
-import junwatson.mycreditcalculator.jwt.TokenType;
 import junwatson.mycreditcalculator.repository.dao.LectureDao;
 import junwatson.mycreditcalculator.repository.dao.LectureSearchCondition;
 import junwatson.mycreditcalculator.repository.dao.RefreshTokenDao;
@@ -36,7 +35,7 @@ public class MemberRepository {
     private final TokenProvider tokenProvider;
     private final LectureDao lectureDao;
     private final RefreshTokenDao refreshTokenDao;
-    private final HashSet<Character> ALLOWED_WORDS = new HashSet<>();
+    private final HashSet<Character> ALLOWED_WORDS = new HashSet<>(List.of('!', '@', '#', '$', '%', '^', '&', '*', '.'));
 
     @Autowired
     public MemberRepository(EntityManager em, TokenProvider tokenProvider, LectureDao lectureDao, RefreshTokenDao refreshTokenDao) {
@@ -44,12 +43,6 @@ public class MemberRepository {
         this.tokenProvider = tokenProvider;
         this.lectureDao = lectureDao;
         this.refreshTokenDao = refreshTokenDao;
-
-        char[] allowedWordsArr = {'!', '@', '#', '$', '%', '^', '&', '*', '.'};
-
-        for (char word : allowedWordsArr) {
-            ALLOWED_WORDS.add(word);
-        }
     }
 
     /**
@@ -253,10 +246,8 @@ public class MemberRepository {
     private boolean signUpValidate(String email, String password, String name) {
         log.info("MemberRepository.signUpValidate() called");
 
-        validate(email, password, name);
-
-        // 해당 이메일로 가입한 회원이 이미 있는지 검사
-        return findMemberByEmail(email).isEmpty();
+        // 해당 이메일로 가입한 회원이 이미 있는지까지 검사
+        return validate(email, password, name) && findMemberByEmail(email).isEmpty();
     }
 
     /**
