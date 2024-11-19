@@ -4,7 +4,6 @@ import junwatson.mycreditcalculator.domain.Lecture;
 import junwatson.mycreditcalculator.domain.LectureType;
 import junwatson.mycreditcalculator.domain.Member;
 import junwatson.mycreditcalculator.exception.lecture.LectureNotExistException;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,7 +14,6 @@ import java.util.stream.Stream;
 
 @Repository
 @Transactional
-@RequiredArgsConstructor
 @Slf4j
 public class LectureDao {
 
@@ -54,6 +52,7 @@ public class LectureDao {
 
     /**
      * 해당 회원의 전체 강의를 조건에 따라 조회하는 메서드.
+     * @param condition 조건을 지정하는 파라미터. 조건을 지정하고 싶지 않을 경우 LectureSearchCondition.noCondition() 사용
      */
     public List<Lecture> findLecturesByMember(Member member, LectureSearchCondition condition) {
         log.info("LectureDao.findLecturesByMember() called");
