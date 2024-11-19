@@ -2,7 +2,6 @@ package junwatson.mycreditcalculator.repository.dao;
 
 import junwatson.mycreditcalculator.domain.Member;
 import junwatson.mycreditcalculator.domain.RefreshToken;
-import junwatson.mycreditcalculator.exception.token.IllegalTokenException;
 import junwatson.mycreditcalculator.jwt.TokenProvider;
 import junwatson.mycreditcalculator.jwt.TokenType;
 import lombok.RequiredArgsConstructor;
