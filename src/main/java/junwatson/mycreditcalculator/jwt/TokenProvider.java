@@ -24,9 +24,9 @@ import java.util.Date;
 public class TokenProvider {
 
     private static final String ROLE_CLAIM = "ROLE";
+    private static final String TOKEN_TYPE_CLAIM = "JunWatson/MyCredit/TokenType";
     private static final String BEARER = "Bearer ";
     private static final String AUTHORIZATION = "Authorization";
-    private static final String TOKEN_TYPE_CLAIM = "JunWatson/TokenType";
 
     private final Key key;
     private final long accessTokenValidityTime;
